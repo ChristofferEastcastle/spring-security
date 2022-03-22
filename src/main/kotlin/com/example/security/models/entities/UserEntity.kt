@@ -12,7 +12,7 @@ class UserEntity(
     val username: String,
     val password: String,
     val enabled: Boolean,
-
-    @OneToMany(fetch = FetchType.EAGER)
+) {
+    @ManyToMany(fetch = FetchType.EAGER)
     val authorities: MutableList<AuthorityEntity> = mutableListOf()
-)
+}
