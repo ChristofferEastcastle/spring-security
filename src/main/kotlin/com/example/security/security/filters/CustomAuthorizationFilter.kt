@@ -1,5 +1,6 @@
 package com.example.security.security.filters
 
+import com.example.security.security.AdditionalFormLoginConfigurer.Companion.LOGIN_PAGE_URL
 import com.example.security.security.jwt.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -9,10 +10,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 import javax.servlet.FilterChain
+import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class CustomAuthorizationFilter : OncePerRequestFilter() {
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -24,10 +27,10 @@ class CustomAuthorizationFilter : OncePerRequestFilter() {
             token == null -> {
                 filterChain.doFilter(request, response)
             }
-            request.pathInfo.contains("/login") -> {
+            request.servletPath.contains(LOGIN_PAGE_URL) -> {
                 filterChain.doFilter(request, response)
             }
-            request.pathInfo.contains("/register") -> {
+            request.servletPath.contains("/register") -> {
                 filterChain.doFilter(request, response)
             }
             else -> {
@@ -41,10 +44,13 @@ class CustomAuthorizationFilter : OncePerRequestFilter() {
                     filterChain.doFilter(request, response)
 
                 } catch (e: Exception) {
-                    logger.error("Authorization error ${e.message}")
+                    logger.error("Authorization ERROR: ${e.message}")
                     response.contentType = APPLICATION_JSON_VALUE
                     response.status = FORBIDDEN.value()
                     val error = mapOf("error_message" to e.message)
+                    response.addCookie(Cookie("access_token", null))
+                    filterChain.doFilter(request, response)
+                    //response.sendRedirect(LOGOUT_PAGE)
                     jacksonObjectMapper().writeValue(response.outputStream, error)
                 }
             }

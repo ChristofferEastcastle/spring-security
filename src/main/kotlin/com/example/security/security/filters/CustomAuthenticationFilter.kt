@@ -1,19 +1,21 @@
 package com.example.security.security.filters
 
+import com.example.security.security.jwt.JwtUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import java.lang.RuntimeException
+import javax.servlet.FilterChain
+import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class CustomAuthenticationFilter(
     @Autowired private val authManager: AuthenticationManager
-): UsernamePasswordAuthenticationFilter() {
+) : UsernamePasswordAuthenticationFilter() {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -27,5 +29,17 @@ class CustomAuthenticationFilter(
             throw RuntimeException("Could not authenticate")
 
         return auth
+    }
+
+    override fun successfulAuthentication(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        chain: FilterChain,
+        authResult: Authentication
+    ) {
+        val user = authResult.principal as User
+        val accessToken = JwtUtil.createToken(user, issuer = request.servletPath, minutes = 10)
+        response.addCookie(Cookie("access_token", accessToken))
+        chain.doFilter(request, response)
     }
 }

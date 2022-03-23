@@ -10,10 +10,10 @@ object JwtUtil {
     private const val SECRET = "do_not_store_secrets_in_the_source_code"
     private val algorithm = Algorithm.HMAC256(SECRET)
 
-    fun createToken(user: User, issuer: String): String {
+    fun createToken(user: User, issuer: String, minutes: Int): String {
         return JWT.create()
             .withSubject(user.username)
-            .withExpiresAt(Date(System.currentTimeMillis() + 10 * 60 * 1000))
+            .withExpiresAt(Date(System.currentTimeMillis() + minutes * 60 * 1000))
             .withIssuer(issuer)
             .withClaim("authorities", user.authorities.map { it.authority })
             .sign(algorithm)
