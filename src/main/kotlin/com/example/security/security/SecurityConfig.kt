@@ -22,7 +22,13 @@ class SecurityConfig(
     @Autowired private val userDetailsService: UserDetailsService,
     @Autowired private val passwordEncoder: BCryptPasswordEncoder,
 ) : WebSecurityConfigurerAdapter() {
+
     private val routesWithoutAuth = listOf<String>()
+    companion object {
+        const val LOGIN_PAGE_URL = "/api/auth/login"
+        const val LOGIN_URL = "/"
+        const val LOGOUT_PAGE_URL = "/api/auth/logout"
+    }
 
     enum class Authorities {
         USER, ADMIN

@@ -1,6 +1,6 @@
 package com.example.security.security.filters
 
-import com.example.security.security.AdditionalFormLoginConfigurer.Companion.LOGIN_PAGE_URL
+import com.example.security.security.SecurityConfig.Companion.LOGIN_PAGE_URL
 import com.example.security.security.jwt.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpStatus.FORBIDDEN
