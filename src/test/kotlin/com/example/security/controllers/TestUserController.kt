@@ -32,6 +32,7 @@ import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @WebMvcTest
+@Import(UserService::class)
 @Profile("test")
 @AutoConfigureMockMvc(addFilters = false)
 class TestUserController {
@@ -40,24 +41,28 @@ class TestUserController {
     private val userTwo = UserDto(id = 2, username = "test2", enabled = true)
     private val users = listOf(userOne, userTwo)
 
+
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @Autowired
-    private lateinit var userService: UserService
+    private val userService = mockk<UserService>()
+    private val userRepo = mockk<UserRepo>()
 
-    @TestConfiguration
+    /*@TestConfiguration
     class ControllerTestConfig {
         @Bean
-        fun userService() = mockk<UserService>()
-    }
+        fun getMockMvc(): MockMvc {
+
+        }
+    }*/
+
 
 
     @Test
     fun testGetUsers() {
-        every { userService.fetchAllUsers() } answers  {
+        /*every { userService.fetchAllUsers() } answers  {
             users
-        }
+        }*/
 
         val result = mockMvc.get("/api/users")
             .andExpect { status { isOk() } }

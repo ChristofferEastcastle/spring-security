@@ -12,11 +12,12 @@ import org.springframework.context.annotation.Profile
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @SpringBootApplication
-@Profile("dev")
 class SecurityApplication {
 
     @Bean
     fun init(@Autowired userService: UserService) = CommandLineRunner {
+        val userAuthority = userService.createAuthority(AuthorityEntity(name = "USER"))
+        val adminAuthority = userService.createAuthority(AuthorityEntity(name = "ADMIN"))
         val jimbob =
             UserRegistrationDto(
                 username = "jim@bob.com",
@@ -27,8 +28,6 @@ class SecurityApplication {
                 username = "joe@bob.com",
                 password = passwordEncoder().encode("pirate"))
         userService.registerUser(joebob)
-        val userAuthority = userService.createAuthority(AuthorityEntity(name = "USER"))
-        val adminAuthority = userService.createAuthority(AuthorityEntity(name = "ADMIN"))
         userService.grantAuthorityToUser(jimbob.username, userAuthority.name)
         userService.grantAuthorityToUser(joebob.username, adminAuthority.name)
     }

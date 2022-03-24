@@ -16,10 +16,7 @@ class UserController(@Autowired val userService: UserService) {
     @GetMapping
     fun getUsers(): List<UserDto>{
         return userService.fetchAllUsers()
-    }
-
-    @GetMapping("{id}")
-    fun getUser(@PathVariable id: Int) {
-        TODO("Not yet implemented")
+            .map { UserDto(it.id, it.username, it.enabled) }
+            .toList()
     }
 }

@@ -1,6 +1,5 @@
 package com.example.security.services
 
-import com.example.security.models.dtos.UserDto
 import com.example.security.models.dtos.UserRegistrationDto
 import com.example.security.models.entities.AuthorityEntity
 import com.example.security.models.entities.UserEntity
@@ -15,31 +14,28 @@ import com.example.security.security.SecurityConfig.Authorities.USER
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import javax.persistence.Entity
 
 @Service
 class UserService(
     @Autowired private val userRepo: UserRepo,
     @Autowired private val authorityRepo : AuthorityRepo
 ) : UserDetailsService {
-    fun fetchAllUsers(): List<UserDto> {
-        return userRepo
-            .findAll()
-            .map { UserDto(it.id, it.username, it.enabled) }
-            .toList()
+    fun fetchAllUsers(): List<UserEntity> {
+        return userRepo.findAll()
     }
 
-    override fun loadUserByUsername(username: String?): UserDetails {
-        username?.let {
+    override fun loadUserByUsername(username: String): UserDetails {
+        try {
             val user = userRepo.findByUsername(username)
             return User(user.username, user.password, user.authorities.map { SimpleGrantedAuthority(it.name) })
+        } catch (e: Exception) {
+            throw UsernameNotFoundException("Error authenticating user")
         }
-        throw UsernameNotFoundException("Error authenticating user")
     }
 
     fun registerUser(user: UserRegistrationDto): UserEntity {
         val newUser = UserEntity(username = user.username, password = user.password, enabled = true)
-        newUser.authorities.add(AuthorityEntity(name = USER.name))
+        authorityRepo.findByName(USER.name)?.let { newUser.authorities.add(it) }
         return userRepo.save(newUser)
     }
 
@@ -50,7 +46,7 @@ class UserService(
     fun grantAuthorityToUser(username: String, authorityName: String) {
         val user = userRepo.findByUsername(username)
         val authority = authorityRepo.findByName(authorityName)
-        user.authorities.add(authority)
+        authority?.let { user.authorities.add(it) }
         userRepo.save(user)
     }
 }

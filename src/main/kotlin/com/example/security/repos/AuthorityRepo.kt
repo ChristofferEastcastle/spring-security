@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface AuthorityRepo : JpaRepository<AuthorityEntity, Long> {
-    fun findByName(authority: String) : AuthorityEntity
+    fun findByName(authority: String) : AuthorityEntity?
 }
