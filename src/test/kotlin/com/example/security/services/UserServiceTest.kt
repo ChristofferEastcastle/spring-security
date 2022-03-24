@@ -110,12 +110,9 @@ internal class UserServiceTest {
 
         userService.grantAuthorityToUser(username, authorityString)
 
-        val user = userService.loadUserByUsername(username)
-        assertThat(user)
+        val userAuthorities = userService.loadUserByUsername(username).authorities
+        assertThat(userAuthorities)
             .isNotNull
-            .hasNoNullFieldsOrProperties()
-            .hasFieldOrPropertyWithValue("authorities",
-                listOf(SimpleGrantedAuthority(authorityString))
-            )
+            .contains(SimpleGrantedAuthority(authorityString))
     }
 }
