@@ -10,9 +10,12 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
 import com.example.security.repos.UserRepo
+import com.example.security.security.SecurityConfig
+import com.example.security.security.SecurityConfig.Authorities.USER
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import javax.persistence.Entity
 
 @Service
 class UserService(
@@ -34,9 +37,10 @@ class UserService(
         throw UsernameNotFoundException("Error authenticating user")
     }
 
-    fun registerUser(user: UserRegistrationDto): UserDto {
-        val saved = userRepo.save(UserEntity(username = user.username, password = user.password, enabled = true))
-        return UserDto(saved.id, saved.username, saved.enabled)
+    fun registerUser(user: UserRegistrationDto): UserEntity {
+        val newUser = UserEntity(username = user.username, password = user.password, enabled = true)
+        newUser.authorities.add(AuthorityEntity(name = USER.name))
+        return userRepo.save(newUser)
     }
 
     fun createAuthority(authority: AuthorityEntity): AuthorityEntity {
