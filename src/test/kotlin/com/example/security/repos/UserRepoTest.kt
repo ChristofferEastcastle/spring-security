@@ -1,38 +1,50 @@
 package com.example.security.repos
 
-import com.example.security.models.entities.AuthorityEntity
+import com.example.security.models.entities.UserEntity
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit4.SpringRunner
 
 
 @DataJpaTest
 @ActiveProfiles("test")
-@ContextConfiguration(classes = [UserRepo::class, AuthorityEntity::class])
-@EnableJpaRepositories(basePackages = ["com.example.security.repos"])
-/*
+@ContextConfiguration(classes = [UserRepo::class])
+@EnableJpaRepositories(basePackages = ["com.example.security.*"])
+@EntityScan("com.example.security.models")
 
-@ComponentScan(basePackages = ["com.example.security.*"])
-@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
-//@Import(AuthorityEntity::class)
-@EntityScan("com.example.security.*")
-*/
-class UserRepoTest{
-
+class UserRepoTest(
     @Autowired
-    private lateinit var userRepo: UserRepo
+    private val userRepo: UserRepo
+) {
 
+    @BeforeEach
+    fun init() {
+        userRepo.save(UserEntity(username = "jim@bob.com", password = "password", enabled = true))
+    }
 
     @Test
     fun findByUsernameTest() {
-        val username = "batman"
-        userRepo.findByUsername(username)
+        val username = "jim@bob.com"
         val result = userRepo.findByUsername(username)
 
+        assertThat(result)
+            .isNotNull
+            .hasFieldOrPropertyWithValue("username", username)
+    }
 
+    @Test
+    fun doNotFindByUsernameTest() {
+        assertThatThrownBy { userRepo.findByUsername("something") }
+            .isNotNull
+            .hasMessage("Result must not be null!")
+            .isInstanceOf(EmptyResultDataAccessException::class.java)
     }
 }

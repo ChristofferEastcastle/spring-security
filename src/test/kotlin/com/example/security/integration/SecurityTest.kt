@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.OK
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -20,8 +21,6 @@ class SecurityTest(
 ) {
     @Autowired
     private lateinit var mockMvc: MockMvc
-
-
 
     @Test
     fun failBasicLoginTest() {
@@ -39,13 +38,23 @@ class SecurityTest(
             .isEqualTo(FORBIDDEN.value())
     }
 
-    @Test
+    //@Test
     fun basicLoginTest() {
         val username = "joe@bob.com"
         val password = "pirate"
 
-        mockMvc.post("/login") {
-            //contentType(APPLICATION_FORM_URLENCODED)
-        }
+        val result = mockMvc.perform(
+            post("http://localhost:8080/login")
+                .contentType(APPLICATION_FORM_URLENCODED)
+                .param("username", username)
+                .param("password", password))
+            .andReturn()
+
+        //val cookie = result.response.getCookie("access_token")
+
+
+        assertThat(result.response.status)
+            .isEqualTo(OK)
+
     }
 }
