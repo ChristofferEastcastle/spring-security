@@ -1,0 +1,6 @@
+FROM openjdk
+WORKDIR /usr/src/app
+
+COPY app.jar .
+
+CMD java -jar app.jar
