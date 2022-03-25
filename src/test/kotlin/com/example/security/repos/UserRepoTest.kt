@@ -21,9 +21,9 @@ import org.springframework.test.context.ContextConfiguration
 @EntityScan("com.example.security.models")
 
 class UserRepoTest(
-    @Autowired
-    private val userRepo: UserRepo
 ) {
+    @Autowired
+    private lateinit var userRepo: UserRepo
 
     @BeforeEach
     fun init() {
