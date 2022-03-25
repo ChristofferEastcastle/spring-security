@@ -3,7 +3,9 @@ package com.example.security.security.filters
 import com.example.security.security.SecurityConfig.Companion.LOGIN_PAGE_URL
 import com.example.security.security.jwt.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -46,12 +48,13 @@ class CustomAuthorizationFilter : OncePerRequestFilter() {
                 } catch (e: Exception) {
                     logger.error("Authorization ERROR: ${e.message}")
                     response.contentType = APPLICATION_JSON_VALUE
-                    response.status = FORBIDDEN.value()
+                    response.status = UNAUTHORIZED.value()
                     val error = mapOf("error_message" to e.message)
-                    response.addCookie(Cookie("access_token", null))
-                    filterChain.doFilter(request, response)
-                    //response.sendRedirect(LOGOUT_PAGE)
+                    val cookie = Cookie("access_token", null)
+                    cookie.maxAge = 0
+                    response.addCookie(cookie)
                     jacksonObjectMapper().writeValue(response.outputStream, error)
+
                 }
             }
         }

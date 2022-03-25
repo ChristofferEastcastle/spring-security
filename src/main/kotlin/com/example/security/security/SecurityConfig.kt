@@ -6,6 +6,7 @@ import com.example.security.security.filters.CustomAuthorizationFilter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(
     @Autowired private val userDetailsService: UserDetailsService,
     @Autowired private val passwordEncoder: BCryptPasswordEncoder,
+    @Autowired private val env: Environment
 ) : WebSecurityConfigurerAdapter() {
 
     private val routesWithoutAuth = listOf<String>()
@@ -40,6 +42,11 @@ class SecurityConfig(
     }
 
     override fun configure(http: HttpSecurity) {
+
+        if (env.activeProfiles.contains("test")) {
+            http.csrf().disable();
+        }
+
         val authFilter = CustomAuthenticationFilter(authenticationManagerBean())
         //authFilter.setFilterProcessesUrl("/")
         http

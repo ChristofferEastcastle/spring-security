@@ -14,6 +14,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 @SpringBootApplication
+@Profile("default")
 class SecurityApplication {
 
     @Bean
