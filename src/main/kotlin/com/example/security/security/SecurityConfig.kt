@@ -25,7 +25,6 @@ class SecurityConfig(
     @Autowired private val env: Environment
 ) : WebSecurityConfigurerAdapter() {
 
-    private val routesWithoutAuth = listOf<String>()
     companion object {
         const val LOGIN_PAGE_URL = "/api/auth/login"
         const val LOGIN_URL = "/"
@@ -44,17 +43,11 @@ class SecurityConfig(
     override fun configure(http: HttpSecurity) {
 
         if (env.activeProfiles.contains("test")) {
-            http.csrf().disable();
+            http.csrf().disable()
         }
-
         val authFilter = CustomAuthenticationFilter(authenticationManagerBean())
-        //authFilter.setFilterProcessesUrl("/")
         http
             .addFilter(authFilter)
-            .sessionManagement()
-            // No need for session because we are using our own JWT to control this.
-            .sessionCreationPolicy(SessionCreationPolicy.NEVER)
-            .and()
             .authorizeRequests()
             .antMatchers("/api/users/**").hasAuthority(ADMIN.name)
             .anyRequest()
@@ -65,7 +58,10 @@ class SecurityConfig(
             .and()
             .logout()
             .deleteCookies("access_token")
-
+            .and()
+            .sessionManagement()
+            // No need for session because we are using our own JWT to control this.
+            .sessionCreationPolicy(SessionCreationPolicy.NEVER)
     }
 
     @Bean
