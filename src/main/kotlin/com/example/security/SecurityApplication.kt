@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @SpringBootApplication
-@Profile("default")
 class SecurityApplication{
 
     @Bean

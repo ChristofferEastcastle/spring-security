@@ -1,22 +1,30 @@
 package com.example.security.integration
 
+import com.example.security.security.jwt.cookieSecret
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.FORBIDDEN
-import org.springframework.http.HttpStatus.OK
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import javax.servlet.http.Cookie
 
 @SpringBootTest
 @ActiveProfiles("test")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc()
+@ContextConfiguration(classes = [SecurityConfigForTests::class])
+@Import(SecurityConfigForTests::class)
 class SecurityTest(
 ) {
     @Autowired
@@ -35,26 +43,42 @@ class SecurityTest(
         )
             .andReturn()
         assertThat(result.response.status)
-            .isEqualTo(FORBIDDEN.value())
+            .isEqualTo(UNAUTHORIZED.value())
     }
 
-    //@Test
+    @Test
     fun basicLoginTest() {
-        val username = "joe@bob.com"
-        val password = "pirate"
+        val username = "security"
+        val password = "password"
 
         val result = mockMvc.perform(
             post("http://localhost:8080/login")
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("username", username)
-                .param("password", password))
+                .param("password", password)
+        )
             .andReturn()
 
-        //val cookie = result.response.getCookie("access_token")
-
+        val accessToken = result.response.getCookie("access_token")
+        assertThat(accessToken)
+            .isNotNull
 
         assertThat(result.response.status)
-            .isEqualTo(OK)
+            .isEqualTo(HttpStatus.FOUND.value())
+
+        assertThat(result.response.getHeader("Location"))
+            .isEqualTo("/")
+
+        val newResult = mockMvc.perform(get("/api/users/")
+            .accept(APPLICATION_JSON)
+            .cookie(accessToken!!)
+
+        )
+            .andReturn()
+
+        assertThat(newResult.response.status)
+            .isEqualTo(HttpStatus.OK.value())
+
 
     }
 }

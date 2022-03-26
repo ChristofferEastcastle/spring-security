@@ -54,7 +54,6 @@ class CustomAuthorizationFilter : OncePerRequestFilter() {
                     cookie.maxAge = 0
                     response.addCookie(cookie)
                     jacksonObjectMapper().writeValue(response.outputStream, error)
-
                 }
             }
         }
