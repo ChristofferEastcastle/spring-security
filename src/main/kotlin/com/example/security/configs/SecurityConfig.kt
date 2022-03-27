@@ -1,11 +1,12 @@
-package com.example.security.security
+package com.example.security.configs
 
-import com.example.security.security.SecurityConfig.Authorities.ADMIN
+import com.example.security.configs.SecurityConfig.Authorities.ADMIN
 import com.example.security.security.filters.CustomAuthenticationFilter
 import com.example.security.security.filters.CustomAuthorizationFilter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.core.env.Environment
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
+@Profile("!user-controller-test")
 class SecurityConfig(
     @Autowired private val userDetailsService: UserDetailsService,
     @Autowired private val passwordEncoder: BCryptPasswordEncoder,

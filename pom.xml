@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
-            <version>3.18.3</version>
+            <version>3.19.0</version>
         </dependency>
         <dependency>
             <groupId>io.mockk</groupId>
@@ -74,6 +74,11 @@
             <artifactId>kotlin-test</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

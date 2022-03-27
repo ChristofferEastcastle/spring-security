@@ -5,7 +5,7 @@ import com.example.security.models.entities.AuthorityEntity
 import com.example.security.models.entities.UserEntity
 import com.example.security.repos.AuthorityRepo
 import com.example.security.repos.UserRepo
-import com.example.security.security.SecurityConfig.Authorities.USER
+import com.example.security.configs.SecurityConfig.Authorities.USER
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
