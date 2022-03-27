@@ -9,8 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
 import com.example.security.repos.UserRepo
-import com.example.security.security.SecurityConfig
-import com.example.security.security.SecurityConfig.Authorities.USER
+import com.example.security.configs.SecurityConfig.Authorities.USER
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UsernameNotFoundException

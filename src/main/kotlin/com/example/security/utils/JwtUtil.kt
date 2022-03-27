@@ -1,4 +1,4 @@
-package com.example.security.security.jwt
+package com.example.security.utils
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
@@ -21,10 +21,10 @@ class CookieSecretInitializer: CommandLineRunner {
     private val cookieSecretStr = "COOKIE_SECRET"
 
     override fun run(vararg args: String?) {
-        if (env.activeProfiles.contains("test"))
-            cookieSecret = env.getProperty(cookieSecretStr)
+        cookieSecret = if (env.activeProfiles.contains("test"))
+            env.getProperty(cookieSecretStr)
         else
-            cookieSecret = System.getenv()[cookieSecretStr]
+            System.getenv()[cookieSecretStr]
         if (cookieSecret.isNullOrBlank())
             throw RuntimeException("$cookieSecretStr env variable must be set")
         //TODO: Create custom exception

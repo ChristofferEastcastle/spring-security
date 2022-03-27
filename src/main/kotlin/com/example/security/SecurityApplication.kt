@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 @SpringBootApplication
 class SecurityApplication{
 
+    @Profile("!user-controller-test")
     @Bean
     fun init(@Autowired userService: UserService) = CommandLineRunner {
         val userAuthority = userService.createAuthority(AuthorityEntity(name = "USER"))
@@ -33,9 +34,9 @@ class SecurityApplication{
     }
 
     @Bean
-    fun passwordEncoder() : BCryptPasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
+    fun passwordEncoder() : BCryptPasswordEncoder = BCryptPasswordEncoder()
+
+
 }
 
 

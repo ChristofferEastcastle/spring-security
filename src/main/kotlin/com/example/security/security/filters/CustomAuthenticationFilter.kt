@@ -1,6 +1,6 @@
 package com.example.security.security.filters
 
-import com.example.security.security.jwt.JwtUtil
+import com.example.security.utils.JwtUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AuthenticationManager
