@@ -1,6 +1,5 @@
 package com.example.security.integration
 
-import com.example.security.models.entities.UserEntity
 import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
 import org.assertj.core.api.Assertions.assertThat
@@ -20,8 +19,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import java.util.*
 import javax.servlet.http.Cookie
 
 @SpringBootTest
@@ -75,6 +72,7 @@ class SecurityTest {
             .andExpect { content { contentType(APPLICATION_JSON) } }
     }
 
+    // Using this class to create a fake JWT token to test security
     @Service
     class UserDetailsCreator : UserDetailsService {
         override fun loadUserByUsername(username: String): UserDetails {
@@ -93,10 +91,12 @@ class SecurityTest {
             "tester.com", 10
         )
 
+        val errorMessage = "{\"error_message\":\"Error authenticating user\"}"
         mockMvc.get("/") {
             cookie(Cookie("access_token", token))
         }
             .andExpect { status { isUnauthorized() } }
-            .andExpect { content { string("ERROR!") } }
+            .andExpect { content { string(errorMessage) } }
+
     }
 }

@@ -3,6 +3,7 @@ package com.example.security.configs
 import com.example.security.configs.SecurityConfig.Authorities.ADMIN
 import com.example.security.security.filters.CustomAuthenticationFilter
 import com.example.security.security.filters.CustomAuthorizationFilter
+import com.example.security.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Profile("!user-controller-test")
 class SecurityConfig(
     @Qualifier("userService") @Autowired private val userDetailsService: UserDetailsService,
+    @Autowired private val userService: UserService,
     @Autowired private val passwordEncoder: BCryptPasswordEncoder,
     @Autowired private val env: Environment
 ) : WebSecurityConfigurerAdapter() {
@@ -56,7 +58,7 @@ class SecurityConfig(
             .anyRequest()
             .authenticated()
             .and()
-            .addFilterBefore(CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter::class.java)
             .formLogin()
             .and()
             .logout()
