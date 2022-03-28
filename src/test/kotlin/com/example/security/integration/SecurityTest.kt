@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -25,6 +26,9 @@ import javax.servlet.http.Cookie
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 class SecurityTest {
+
+    @Autowired
+    private lateinit var env: Environment
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -50,11 +54,11 @@ class SecurityTest {
 
     @Test
     fun basicLoginTest() {
-        val username = "joe@bob.com"
-        val password = "pirate"
+        val username = env.getProperty("TEST_USERNAME")
+        val password = env.getProperty("TEST_PASSWORD")
 
         val result = mockMvc.perform(
-            post("http://localhost:8080/login")
+            post("/login")
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("username", username)
                 .param("password", password)
@@ -64,7 +68,7 @@ class SecurityTest {
         assertThat(accessToken)
             .isNotNull
 
-        mockMvc.get("http://localhost:8080/api/users") {
+        mockMvc.get("/api/users") {
             cookie(accessToken!!)
             accept = APPLICATION_JSON
         }

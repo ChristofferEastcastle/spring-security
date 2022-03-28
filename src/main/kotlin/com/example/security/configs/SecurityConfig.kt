@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
 import org.springframework.core.env.Environment
 import org.springframework.security.authentication.AuthenticationManager
@@ -26,9 +28,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(
     @Qualifier("userService") @Autowired private val userDetailsService: UserDetailsService,
     @Autowired private val userService: UserService,
-    @Autowired private val passwordEncoder: BCryptPasswordEncoder,
+    @Lazy @Autowired private val passwordEncoder: BCryptPasswordEncoder,
     @Autowired private val env: Environment
 ) : WebSecurityConfigurerAdapter() {
+
+    @Bean
+    fun passwordEncoder(): BCryptPasswordEncoder = BCryptPasswordEncoder()
 
     companion object {
         const val LOGIN_PAGE_URL = "/login"
