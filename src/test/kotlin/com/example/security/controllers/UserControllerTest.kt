@@ -1,10 +1,11 @@
 package com.example.security.controllers
 
-import com.example.security.configs.UserControllerTestConfig
+import com.example.security.configs.ControllerTestConfig
 import com.example.security.models.dtos.UserDto
 import com.example.security.models.entities.UserEntity
 import com.example.security.services.UserService
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.wrongwrong.mapk.core.KMapper
 import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -18,8 +19,8 @@ import org.springframework.test.web.servlet.get
 
 
 @WebMvcTest(UserController::class)
-@ActiveProfiles("user-controller-test")
-@Import(UserControllerTestConfig::class)
+@ActiveProfiles("controller-test")
+@Import(ControllerTestConfig::class)
 class UserControllerTest(@Autowired val userService: UserService) {
 
     private val userOne = UserDto(id = 1, username = "test1", enabled = true)
@@ -38,7 +39,7 @@ class UserControllerTest(@Autowired val userService: UserService) {
             users.map { UserEntity(it.id, it.username, password = "not needed", it.enabled) }
         }
 
-        val result = mockMvc.get("http://localhost:8080/api/users")
+        val result = mockMvc.get("/api/users")
             .andExpect { status { isOk() } }
             .andExpect { content { contentType(APPLICATION_JSON) } }
             .andReturn()
@@ -51,11 +52,15 @@ class UserControllerTest(@Autowired val userService: UserService) {
 
     @Test
     fun testGetOneUser() {
-
+        val userEntity = UserEntity(username = "test", password = "test_password", enabled = true)
+        every { userService.getUser(any()) } answers {
+            userEntity
+        }
         mockMvc.get("/api/users/1")
             .andExpect { status { isOk() } }
             .andExpect { content { contentType(APPLICATION_JSON) } }
-        //.andExpect { content { json(jacksonObjectMapper().writeValueAsString(userEntity)) } }
+            .andExpect { content { json(jacksonObjectMapper()
+                .writeValueAsString(KMapper(::UserDto).map(userEntity))) } }
 
     }
 }
