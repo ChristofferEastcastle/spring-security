@@ -28,7 +28,7 @@ jobs:
     - name: 🛠 Coveralls Coverage Report Setup
       run: sed -i.bak 's/yourcoverallsprojectrepositorytoken/${{ secrets.REPO_TOKEN }}/g' pom.xml
     - name: 🚀 Coveralls Coverage Report Submission
-      run: mvn coveralls:report
+      run: mvn coveralls:report --define repoToken=${{ secrets.REPO_TOKEN }}
     
     - name: 🧹 Cleanup Repository Token
       if: ${{ always() }}
