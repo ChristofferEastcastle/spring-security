@@ -49,7 +49,7 @@ class UserControllerTest(@Autowired val userService: UserService) {
             .isEqualTo(jacksonObjectMapper().writeValueAsString(userController.getUsers()))
     }
 
-    //@Test
+    @Test
     fun testGetOneUser() {
 
         mockMvc.get("/api/users/1")
