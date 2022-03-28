@@ -4,6 +4,7 @@ import com.example.security.configs.SecurityConfig.Authorities.ADMIN
 import com.example.security.security.filters.CustomAuthenticationFilter
 import com.example.security.security.filters.CustomAuthorizationFilter
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -22,13 +23,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @Profile("!user-controller-test")
 class SecurityConfig(
-    @Autowired private val userDetailsService: UserDetailsService,
+    @Qualifier("userService") @Autowired private val userDetailsService: UserDetailsService,
     @Autowired private val passwordEncoder: BCryptPasswordEncoder,
     @Autowired private val env: Environment
 ) : WebSecurityConfigurerAdapter() {
 
     companion object {
-        const val LOGIN_PAGE_URL = "/api/auth/login"
+        const val LOGIN_PAGE_URL = "/login"
         const val LOGIN_URL = "/"
         const val LOGOUT_PAGE_URL = "/api/auth/logout"
     }

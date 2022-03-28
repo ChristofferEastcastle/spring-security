@@ -1,5 +1,8 @@
 package com.example.security.integration
 
+import com.example.security.models.entities.UserEntity
+import com.example.security.services.UserService
+import com.example.security.utils.JwtUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -8,10 +11,18 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import java.util.*
+import javax.servlet.http.Cookie
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -20,6 +31,9 @@ class SecurityTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
+
+    @Autowired
+    private lateinit var userService: UserService
 
     @Test
     fun failBasicLoginTest() {
@@ -59,5 +73,30 @@ class SecurityTest {
         }
             .andExpect { status { isOk() } }
             .andExpect { content { contentType(APPLICATION_JSON) } }
+    }
+
+    @Service
+    class UserDetailsCreator : UserDetailsService {
+        override fun loadUserByUsername(username: String): UserDetails {
+            return User(
+                username,
+                "test_password",
+                mutableListOf(SimpleGrantedAuthority("ADMIN"))
+            )
+        }
+    }
+
+    @Test
+    fun invalidTokenTest() {
+        val token = JwtUtil.createToken(
+            UserDetailsCreator().loadUserByUsername("test") as User,
+            "tester.com", 10
+        )
+
+        mockMvc.get("/") {
+            cookie(Cookie("access_token", token))
+        }
+            .andExpect { status { isUnauthorized() } }
+            .andExpect { content { string("ERROR!") } }
     }
 }
