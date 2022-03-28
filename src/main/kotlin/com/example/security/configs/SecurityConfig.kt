@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
 import org.springframework.core.env.Environment
@@ -24,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
-@Profile("!user-controller-test")
+@Profile("!controller-test")
 class SecurityConfig(
     @Qualifier("userService") @Autowired private val userDetailsService: UserDetailsService,
     @Autowired private val userService: UserService,

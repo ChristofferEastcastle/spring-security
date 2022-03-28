@@ -1,6 +1,5 @@
 package com.example.security.configs
 
-import com.example.security.exceptions.UserException
 import com.example.security.exceptions.UserException.AdminEnvPasswordNotFoundException
 import com.example.security.exceptions.UserException.AdminEnvUsernameNotFoundException
 import com.example.security.models.dtos.UserRegistrationDto
@@ -21,7 +20,7 @@ class InitialSetup(
 
 ) {
 
-    @Profile("!user-controller-test")
+    @Profile("!controller-test")
     @Bean
     fun init(@Autowired userService: UserService) = CommandLineRunner {
         val adminAuthority = userService.createAuthority(AuthorityEntity(name = "ADMIN"))

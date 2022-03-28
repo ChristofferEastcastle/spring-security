@@ -17,7 +17,18 @@
         <java.version>11</java.version>
         <kotlin.version>1.6.20-RC2</kotlin.version>
     </properties>
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <dependencies>
+        <dependency>
+            <groupId>com.github.ProjectMapK</groupId>
+            <artifactId>KMapper</artifactId>
+            <version>0.7</version>
+        </dependency>
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
