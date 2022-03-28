@@ -3,9 +3,12 @@ package com.example.security.configs
 import com.example.security.configs.SecurityConfig.Authorities.ADMIN
 import com.example.security.security.filters.CustomAuthenticationFilter
 import com.example.security.security.filters.CustomAuthorizationFilter
+import com.example.security.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import org.springframework.context.annotation.Profile
 import org.springframework.core.env.Environment
 import org.springframework.security.authentication.AuthenticationManager
@@ -20,15 +23,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
-@Profile("!user-controller-test")
+@Profile("!controller-test")
 class SecurityConfig(
-    @Autowired private val userDetailsService: UserDetailsService,
-    @Autowired private val passwordEncoder: BCryptPasswordEncoder,
+    @Qualifier("userService") @Autowired private val userDetailsService: UserDetailsService,
+    @Autowired private val userService: UserService,
+    @Lazy @Autowired private val passwordEncoder: BCryptPasswordEncoder,
     @Autowired private val env: Environment
 ) : WebSecurityConfigurerAdapter() {
 
+    @Bean
+    fun passwordEncoder(): BCryptPasswordEncoder = BCryptPasswordEncoder()
+
     companion object {
-        const val LOGIN_PAGE_URL = "/api/auth/login"
+        const val LOGIN_PAGE_URL = "/login"
         const val LOGIN_URL = "/"
         const val LOGOUT_PAGE_URL = "/api/auth/logout"
     }
@@ -55,7 +62,7 @@ class SecurityConfig(
             .anyRequest()
             .authenticated()
             .and()
-            .addFilterBefore(CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter::class.java)
             .formLogin()
             .and()
             .logout()

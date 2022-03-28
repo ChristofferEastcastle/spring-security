@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
 import com.example.security.repos.UserRepo
 import com.example.security.configs.SecurityConfig.Authorities.USER
+import org.springframework.data.domain.Example
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -47,5 +48,13 @@ class UserService(
         val authority = authorityRepo.findByName(authorityName)
         authority?.let { user.authorities.add(it) }
         userRepo.save(user)
+    }
+
+    fun getUser(id: Long): UserEntity? {
+        val user = userRepo.findById(id)
+        if (user.isPresent) {
+            return user.get()
+        }
+        return null
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @TestConfiguration
 @Order(1)
-class UserControllerTestConfig : WebSecurityConfigurerAdapter() {
+class ControllerTestConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http.csrf().disable().authorizeRequests().anyRequest().permitAll()
     }
