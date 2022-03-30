@@ -1,12 +1,10 @@
 package com.example.security.security.filters
 
-import com.example.security.configs.SecurityConfig.Companion.LOGIN_PAGE_URL
-import com.example.security.repos.UserRepo
+import com.example.security.configs.AdditionalFormLoginConfigurer.Companion.LOGIN_PAGE_URL
 import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -63,7 +61,7 @@ class CustomAuthorizationFilter(
                     logger.error("Authorization ERROR: ${e.message}")
                     response.contentType = APPLICATION_JSON_VALUE
                     response.status = UNAUTHORIZED.value()
-                    val error = mapOf("error_message" to e.message)
+                    val error = mapOf("error_message" to "access token invalid!")
                     val cookie = Cookie("access_token", null)
                     cookie.maxAge = 0
                     response.addCookie(cookie)
