@@ -1,6 +1,5 @@
 package com.example.security.security.filters
 
-import com.example.security.configs.AdditionalFormLoginConfigurer.Companion.LOGIN_PAGE_URL
 import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -28,43 +27,35 @@ class CustomAuthorizationFilter(
     ) {
         val token = request.cookies?.firstOrNull { it.name == "access_token" }
 
-        when {
-            token == null -> {
-                filterChain.doFilter(request, response)
-            }
-            request.servletPath.contains(LOGIN_PAGE_URL) -> {
-                filterChain.doFilter(request, response)
-            }
-            request.servletPath.contains("/register") -> {
-                filterChain.doFilter(request, response)
-            }
-            else -> {
-                try {
-                    val decodedToken = JwtUtil.decodeToken(token.value)
-                    val username = decodedToken.subject
-                    // This depends on unique username for the whole system
-                    userService.loadUserByUsername(username)
+        if (token == null) {
+            filterChain.doFilter(request, response)
+            return
+        }
 
-                    val authority = decodedToken.getClaim("authorities").asList(String::class.java)
-                        .map { SimpleGrantedAuthority(it) }
-                    val authToken = UsernamePasswordAuthenticationToken(username, null, authority)
-                    SecurityContextHolder.getContext().authentication = authToken
-                    filterChain.doFilter(request, response)
+        try {
+            val decodedToken = JwtUtil.decodeToken(token = token.value)
+            val username = decodedToken.subject
+            // This depends on unique username for the whole system
+            userService.loadUserByUsername(username)
 
-                } catch (e: Exception) {
-                    val error = when (e) {
-                        is UsernameNotFoundException -> mapOf("error_message" to e.message)
-                        else -> mapOf("error_message" to "access token invalid!")
-                    }
-                    logger.error("Authorization ERROR: ${e.message}")
-                    response.contentType = APPLICATION_JSON_VALUE
-                    response.status = UNAUTHORIZED.value()
-                    val cookie = Cookie("access_token", null)
-                    cookie.maxAge = 0
-                    response.addCookie(cookie)
-                    jacksonObjectMapper().writeValue(response.outputStream, error)
-                }
+            val authority = decodedToken.getClaim("authorities").asList(String::class.java)
+                .map { SimpleGrantedAuthority(it) }
+            val authToken = UsernamePasswordAuthenticationToken(username, null, authority)
+            SecurityContextHolder.getContext().authentication = authToken
+            filterChain.doFilter(request, response)
+
+        } catch (e: Exception) {
+            val error = when (e) {
+                is UsernameNotFoundException -> mapOf("error_message" to e.message)
+                else -> mapOf("error_message" to "access token invalid!")
             }
+            logger.error("Authorization ERROR: ${e.message}")
+            response.contentType = APPLICATION_JSON_VALUE
+            response.status = UNAUTHORIZED.value()
+            val cookie = Cookie("access_token", null)
+            cookie.maxAge = 0
+            response.addCookie(cookie)
+            jacksonObjectMapper().writeValue(response.outputStream, error)
         }
     }
 }
