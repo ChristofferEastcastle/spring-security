@@ -1,12 +1,10 @@
 package com.example.security.security.filters
 
-import com.example.security.configs.SecurityConfig.Companion.LOGIN_PAGE_URL
-import com.example.security.repos.UserRepo
+import com.example.security.configs.AdditionalFormLoginConfigurer.Companion.LOGIN_PAGE_URL
 import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -44,14 +42,8 @@ class CustomAuthorizationFilter(
                 try {
                     val decodedToken = JwtUtil.decodeToken(token.value)
                     val username = decodedToken.subject
-                    try {
-                        // This depends on unique username for the whole system
-                        userService.loadUserByUsername(username)
-                    } catch (e: UsernameNotFoundException) {
-                        response.status = UNAUTHORIZED.value()
-                        jacksonObjectMapper().writeValue(response.writer, mapOf("error_message" to e.message))
-                        return
-                    }
+                    // This depends on unique username for the whole system
+                    userService.loadUserByUsername(username)
 
                     val authority = decodedToken.getClaim("authorities").asList(String::class.java)
                         .map { SimpleGrantedAuthority(it) }
@@ -60,10 +52,13 @@ class CustomAuthorizationFilter(
                     filterChain.doFilter(request, response)
 
                 } catch (e: Exception) {
+                    val error = when (e) {
+                        is UsernameNotFoundException -> mapOf("error_message" to e.message)
+                        else -> mapOf("error_message" to "access token invalid!")
+                    }
                     logger.error("Authorization ERROR: ${e.message}")
                     response.contentType = APPLICATION_JSON_VALUE
                     response.status = UNAUTHORIZED.value()
-                    val error = mapOf("error_message" to e.message)
                     val cookie = Cookie("access_token", null)
                     cookie.maxAge = 0
                     response.addCookie(cookie)

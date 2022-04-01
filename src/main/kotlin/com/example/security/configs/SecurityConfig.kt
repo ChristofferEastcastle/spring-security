@@ -5,6 +5,7 @@ import com.example.security.security.filters.CustomAuthenticationFilter
 import com.example.security.security.filters.CustomAuthorizationFilter
 import com.example.security.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -22,20 +23,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @Configuration
 class SecurityConfig(
-    @Autowired private val userDetailsService: UserDetailsService,
+    @Qualifier("userService") @Autowired private val userDetailsService: UserDetailsService,
     @Autowired private val userService: UserService,
     @Lazy @Autowired private val passwordEncoder: BCryptPasswordEncoder,
     @Autowired private val env: Environment
 ) : WebSecurityConfigurerAdapter() {
 
+    val noAuthPages = listOf("/login, /register")
+
     @Bean
     fun passwordEncoder(): BCryptPasswordEncoder = BCryptPasswordEncoder()
-
-    companion object {
-        const val LOGIN_PAGE_URL = "/login"
-        const val LOGIN_URL = "/"
-        const val LOGOUT_PAGE_URL = "/api/auth/logout"
-    }
 
     enum class Authorities {
         USER, ADMIN
@@ -47,27 +44,42 @@ class SecurityConfig(
     }
 
     override fun configure(http: HttpSecurity) {
-
         if (env.activeProfiles.contains("test")) {
             http.csrf().disable()
         }
         val authFilter = CustomAuthenticationFilter(authenticationManagerBean())
         http
             .addFilter(authFilter)
+            .sessionManagement()
+            // No need for session because we are using our own JWT to control this.
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+        http
+            .authorizeRequests()
+            .antMatchers("/api/auth/register", "/api/auth/login")
+            .permitAll()
+
+        //noAuthPages.forEach { http.authorizeRequests().antMatchers(it).permitAll() }
+        /*http
+            .formLogin()
+            .loginPage(LOGIN_PAGE_URL)
+            .loginProcessingUrl(LOGIN_PROCESSING_URL)
+            .successForwardUrl("/api/users")
+            .permitAll().and().apply(AdditionalFormLoginConfigurer())*/
+        http
             .authorizeRequests()
             .antMatchers("/api/users/**").hasAuthority(ADMIN.name)
             .anyRequest()
             .authenticated()
-            .and()
+
+
+        http
             .addFilterBefore(CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter::class.java)
-            .formLogin()
-            .and()
             .logout()
+            .logoutUrl("/api/logout")
+            .logoutSuccessUrl("/api/login")
             .deleteCookies("access_token")
             .and()
-            .sessionManagement()
-            // No need for session because we are using our own JWT to control this.
-            .sessionCreationPolicy(SessionCreationPolicy.NEVER)
     }
 
     @Bean
