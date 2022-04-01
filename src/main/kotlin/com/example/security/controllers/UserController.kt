@@ -1,19 +1,14 @@
 package com.example.security.controllers
 
 import com.example.security.models.dtos.UserDto
-import com.example.security.models.entities.UserEntity
 import com.example.security.services.UserService
-import com.fasterxml.jackson.module.kotlin.jsonMapper
 import com.wrongwrong.mapk.core.KMapper
-import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.userdetails.User
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import kotlin.reflect.KFunction
 
 @RestController
 @RequestMapping("/api/users")
