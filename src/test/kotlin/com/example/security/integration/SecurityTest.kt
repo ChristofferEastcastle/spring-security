@@ -1,7 +1,7 @@
 package com.example.security.integration
 
-import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,16 +25,18 @@ import javax.servlet.http.Cookie
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class SecurityTest {
-
+class SecurityTest(
     @Autowired
-    private lateinit var env: Environment
+    private var env: Environment
+) {
+
+
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @Autowired
-    private lateinit var userService: UserService
+    private val username: String = env.getProperty("TEST_USERNAME")!!
+    private val password: String = env.getProperty("TEST_PASSWORD")!!
 
     @Test
     fun failBasicLoginTest() {
@@ -54,8 +56,6 @@ class SecurityTest {
 
     @Test
     fun basicLoginTest() {
-        val username = env.getProperty("TEST_USERNAME")
-        val password = env.getProperty("TEST_PASSWORD")
 
         val result = mockMvc.perform(
             post("/login")
@@ -76,6 +76,36 @@ class SecurityTest {
             .andExpect { content { contentType(APPLICATION_JSON) } }
     }
 
+    @Test
+    fun invalidUserTokenTest() {
+        val token = JwtUtil.createToken(
+            UserDetailsCreator().loadUserByUsername("test") as User,
+            issuer = "tester.com", minutes = 10
+        )
+
+        val errorMessage = "{\"error_message\":\"Error authenticating user\"}"
+        mockMvc.get("/") {
+            cookie(Cookie("access_token", token))
+        }
+            .andExpect { status { isUnauthorized() } }
+            .andExpect { content { string(errorMessage) } }
+
+    }
+
+    @Test
+    fun corruptTokenTest() {
+        val token = JwtUtil.createToken(
+            UserDetailsCreator().loadUserByUsername(username) as User,
+            issuer = "tester.com", minutes = 0
+        ).substring(2)
+
+        val errorMessage = jacksonObjectMapper().writeValueAsString(mapOf("error_message" to "access token invalid!"))
+        mockMvc.get("/") {
+            cookie(Cookie("access_token", token))
+        }
+            .andExpect { status { isUnauthorized() } }
+            .andExpect { content { string(errorMessage) } }
+    }
     // Using this class to create a fake JWT token to test security
     @Service
     class UserDetailsCreator : UserDetailsService {
@@ -86,21 +116,5 @@ class SecurityTest {
                 mutableListOf(SimpleGrantedAuthority("ADMIN"))
             )
         }
-    }
-
-    @Test
-    fun invalidTokenTest() {
-        val token = JwtUtil.createToken(
-            UserDetailsCreator().loadUserByUsername("test") as User,
-            "tester.com", 10
-        )
-
-        val errorMessage = "{\"error_message\":\"Error authenticating user\"}"
-        mockMvc.get("/") {
-            cookie(Cookie("access_token", token))
-        }
-            .andExpect { status { isUnauthorized() } }
-            .andExpect { content { string(errorMessage) } }
-
     }
 }

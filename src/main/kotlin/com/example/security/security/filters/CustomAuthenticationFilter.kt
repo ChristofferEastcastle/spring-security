@@ -1,6 +1,5 @@
 package com.example.security.security.filters
 
-import com.example.security.exceptions.CouldNotAuthenticateException
 import com.example.security.utils.JwtUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AuthenticationManager
@@ -21,12 +20,8 @@ class CustomAuthenticationFilter(
         val username = request?.getParameter("username")
         val password = request?.getParameter("password")
         val authenticationToken = UsernamePasswordAuthenticationToken(username, password)
-        val auth = authManager.authenticate(authenticationToken)
 
-        if (!auth.isAuthenticated)
-            throw CouldNotAuthenticateException()
-
-        return auth
+        return authManager.authenticate(authenticationToken)
     }
 
     override fun successfulAuthentication(

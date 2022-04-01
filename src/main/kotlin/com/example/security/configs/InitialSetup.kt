@@ -1,7 +1,7 @@
 package com.example.security.configs
 
-import com.example.security.exceptions.UserException.AdminEnvPasswordNotFoundException
-import com.example.security.exceptions.UserException.AdminEnvUsernameNotFoundException
+import com.example.security.exceptions.AdminEnvPasswordNotFoundException
+import com.example.security.exceptions.AdminEnvUsernameNotFoundException
 import com.example.security.models.dtos.UserRegistrationDto
 import com.example.security.models.entities.AuthorityEntity
 import com.example.security.services.UserService
