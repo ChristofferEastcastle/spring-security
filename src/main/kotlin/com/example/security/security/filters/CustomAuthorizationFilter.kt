@@ -25,13 +25,15 @@ class CustomAuthorizationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = request.cookies.firstOrNull { it.name == "access_token" }
+        val token = request.cookies?.firstOrNull { it.name == "access_token" }
 
-        if (token == null)
+        if (token == null) {
             filterChain.doFilter(request, response)
+            return
+        }
 
         try {
-            val decodedToken = JwtUtil.decodeToken(token!!.value)
+            val decodedToken = JwtUtil.decodeToken(token = token.value)
             val username = decodedToken.subject
             // This depends on unique username for the whole system
             userService.loadUserByUsername(username)
