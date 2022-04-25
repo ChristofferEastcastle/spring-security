@@ -1,6 +1,7 @@
 package com.example.security.configs
 
 import com.example.security.repos.UserRepo
+import com.example.security.services.ShelterService
 import com.example.security.services.UserService
 import io.mockk.mockk
 import org.springframework.boot.test.context.TestConfiguration
@@ -15,6 +16,9 @@ class ControllerTestConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http.csrf().disable().authorizeRequests().anyRequest().permitAll()
     }
+
+    @Bean
+    fun shelterService() = mockk<ShelterService>()
 
     @Bean
     fun userService() = mockk<UserService>()

@@ -4,6 +4,7 @@ import com.example.security.models.dtos.AnimalDto
 import com.example.security.models.dtos.AnimalRegistrationDto
 import com.example.security.models.entities.AnimalEntity
 import com.example.security.services.ShelterService
+import com.wrongwrong.mapk.core.KMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -16,8 +17,11 @@ class ShelterController(
 ) {
 
     @GetMapping()
-    fun retrieveAllAnimals(): ResponseEntity<List<AnimalEntity>> {
-        return ResponseEntity(shelterService.retrieveAllAnimals(), HttpStatus.OK)
+    fun retrieveAllAnimals(): ResponseEntity<List<AnimalDto>> {
+        val animals = shelterService.retrieveAllAnimals()
+            .map { KMapper(::AnimalDto).map(it) }
+
+        return ResponseEntity(animals, HttpStatus.OK)
     }
 
     @GetMapping("{id}")
@@ -52,4 +56,5 @@ class ShelterController(
             false -> ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
+
 }
