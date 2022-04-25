@@ -1,22 +1,24 @@
 package com.example.security.models.entities
 
 import javax.persistence.*
+import javax.persistence.EnumType.STRING
+import javax.persistence.GenerationType.IDENTITY
 
 @Entity
 @Table(name = "animals")
 class AnimalEntity(
     @Id
     @SequenceGenerator(name = "animals_id_seq")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "id", nullable = false)
     var id: Long? = null,
     val name: String,
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(STRING)
     var type: AnimalType,
     val age: Int,
     val health: Int
 )
 
 enum class AnimalType {
-    TIGER, LION, GIRAFFE, HEDGEHOG
+    TIGER, LION, GIRAFFE, HEDGEHOG, PIG, MEERKAT, BEAR
 }

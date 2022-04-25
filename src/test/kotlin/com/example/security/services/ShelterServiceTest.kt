@@ -1,7 +1,7 @@
 package com.example.security.services
 
-import com.example.security.models.dtos.AnimalDto
 import com.example.security.models.dtos.AnimalRegistrationDto
+import com.example.security.models.dtos.AnimalUpdateDto
 import com.example.security.models.entities.AnimalEntity
 import com.example.security.models.entities.AnimalType
 import com.example.security.models.entities.UserEntity
@@ -76,7 +76,7 @@ internal class ShelterServiceTest {
             }
         }
 
-        val updated = KMapper(AnimalDto::class).map(testAnimal1)
+        val updated = KMapper(::AnimalUpdateDto).map(testAnimal1)
         val result = shelterService.updateAnimal(2, updated)
 
         assertThat(result)
