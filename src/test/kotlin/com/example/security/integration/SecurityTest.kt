@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import javax.servlet.http.Cookie
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("security-test")
 @AutoConfigureMockMvc
 class SecurityTest(
     @Autowired

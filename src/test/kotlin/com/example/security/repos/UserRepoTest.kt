@@ -15,7 +15,7 @@ import org.springframework.test.context.ContextConfiguration
 
 
 @DataJpaTest
-@ActiveProfiles("test")
+@ActiveProfiles("security-test")
 @ContextConfiguration(classes = [UserRepo::class])
 @EnableJpaRepositories(basePackages = ["com.example.security.*"])
 @EntityScan("com.example.security.models")
@@ -34,7 +34,6 @@ class UserRepoTest(
     fun findByUsernameTest() {
         val username = "jim@bob.com"
         val result = userRepo.findByUsername(username)
-
         assertThat(result)
             .isNotNull
             .hasFieldOrPropertyWithValue("username", username)
