@@ -3,6 +3,7 @@ package com.example.security.utils
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.example.security.exceptions.EnvironmentVariableNotSetException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.core.env.Environment
@@ -26,8 +27,7 @@ class CookieSecretInitializer: CommandLineRunner {
         else
             System.getenv()[cookieSecretStr]
         if (cookieSecret.isNullOrBlank())
-            throw RuntimeException("$cookieSecretStr env variable must be set")
-        //TODO: Create custom exception
+            throw EnvironmentVariableNotSetException()
     }
 }
 

@@ -1,7 +1,6 @@
 package com.example.security.models.entities
 
 import javax.persistence.*
-import javax.persistence.EnumType.STRING
 import javax.persistence.GenerationType.IDENTITY
 
 @Entity
@@ -11,10 +10,9 @@ class AuthorityEntity(
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "id", nullable = false)
     var id: Long? = null,
-    @Enumerated(STRING)
-    val name: AuthorityName
+    val name: String
 )
 
-enum class AuthorityName {
+enum class Authorities {
     ADMIN, USER, TRAINEE
 }

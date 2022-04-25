@@ -32,7 +32,6 @@ class UserControllerTest(@Autowired val userService: UserService) {
 
     private val userController: UserController = UserController(userService)
 
-
     @Test
     fun testGetUsers() {
         every { userService.fetchAllUsers() } answers {

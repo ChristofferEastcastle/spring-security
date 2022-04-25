@@ -6,11 +6,11 @@ import org.springframework.security.web.authentication.ui.DefaultLoginPageGenera
 
 
 class AdditionalFormLoginConfigurer :
-    AbstractHttpConfigurer<AdditionalFormLoginConfigurer?, HttpSecurity?>() {
+    AbstractHttpConfigurer<AdditionalFormLoginConfigurer, HttpSecurity?>() {
     companion object {
-        const val LOGIN_PAGE_URL = "/api/login"
-        const val LOGIN_PROCESSING_URL = "/login"
-        const val LOGOUT_PAGE_URL = "/api/auth/logout"
+        const val LOGIN_PAGE_URL = "/api/users"
+        const val LOGIN_PROCESSING_URL = "/api/authentication/login"
+        const val LOGOUT_PAGE_URL = "/api/authentication/logout"
     }
 
     @Throws(Exception::class)

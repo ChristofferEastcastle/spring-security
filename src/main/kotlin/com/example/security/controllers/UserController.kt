@@ -17,7 +17,7 @@ class UserController(@Autowired val userService: UserService) {
     @GetMapping
     fun getUsers(): List<UserDto>{
         return userService.fetchAllUsers()
-            .map { UserDto(it.id, it.username, it.enabled) }
+            .map { KMapper(::UserDto).map(it) }
             .toList()
     }
 

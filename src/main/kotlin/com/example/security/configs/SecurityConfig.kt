@@ -1,11 +1,13 @@
 package com.example.security.configs
 
-import com.example.security.configs.SecurityConfig.Authorities.ADMIN
+import com.example.security.models.dtos.UserRegistrationDto
+import com.example.security.models.entities.Authorities.ADMIN
 import com.example.security.security.filters.CustomAuthenticationFilter
 import com.example.security.security.filters.CustomAuthorizationFilter
 import com.example.security.services.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -15,10 +17,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import kotlin.concurrent.thread
+
+private const val LOGIN_URL = "/api/authentication/login"
+private const val REGISTER_URL = "/api/authentication/register"
 
 @EnableWebSecurity
 @Configuration
@@ -29,38 +34,39 @@ class SecurityConfig(
     @Autowired private val env: Environment
 ) : WebSecurityConfigurerAdapter() {
 
-    val noAuthPages = listOf("/login, /register")
-
     @Bean
     fun passwordEncoder(): BCryptPasswordEncoder = BCryptPasswordEncoder()
-
-    enum class Authorities {
-        USER, ADMIN
-    }
-
 
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder)
     }
 
+    @Bean
+    fun config() = CommandLineRunner {
+        thread {
+            Thread.sleep(5000)
+            userService.registerUser(UserRegistrationDto("test", passwordEncoder.encode("test")))
+        }
+
+    }
+
     override fun configure(http: HttpSecurity) {
         val authFilter = CustomAuthenticationFilter(authenticationManagerBean())
+        authFilter.setFilterProcessesUrl(LOGIN_URL)
+        authFilter.setAllowSessionCreation(false)
+
         http
             .csrf().disable()
-            .addFilter(authFilter)
             .sessionManagement()
+            .maximumSessions(-1)
             // No need for session because we are using our own JWT to control this.
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
 
         http
+            .addFilter(authFilter)
             .authorizeRequests()
-            .antMatchers("/api/auth/register", "/api/auth/login")
-            .permitAll()
-
-        http
-            .authorizeRequests()
-            .antMatchers("/api/shelter/**")
-            .permitAll()
+            .antMatchers("/", REGISTER_URL, LOGIN_URL).permitAll()
+            .antMatchers("/api/shelter/**").hasAuthority(ADMIN.name)
             .antMatchers("/api/users/**").hasAuthority(ADMIN.name)
             .anyRequest()
             .authenticated()
@@ -71,6 +77,9 @@ class SecurityConfig(
             .logoutUrl("/api/logout")
             .logoutSuccessUrl("/api/login")
             .deleteCookies("access_token")
+            .and()
+            .formLogin().disable()
+
     }
 
     @Bean
