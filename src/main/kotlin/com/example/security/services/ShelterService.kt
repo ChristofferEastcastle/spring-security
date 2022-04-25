@@ -43,4 +43,14 @@ class ShelterService(
         shelterRepo.save(updatedAnimal)
         return true
     }
+
+    // Returning true if the entity was found, and we can safely delete.
+    // Returning false if the entity was not found, telling controller we could not delete.
+    fun deleteAnimal(id: Long): Boolean {
+        val animalFound = shelterRepo.findById(id)
+        if (animalFound.isEmpty) return false
+
+        shelterRepo.deleteById(id)
+        return true
+    }
 }

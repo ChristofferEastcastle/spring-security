@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 
-interface ShelterRepo : JpaRepository<AnimalEntity, Long>
+interface ShelterRepo : JpaRepository<AnimalEntity, Long> {
+    fun deleteAnimalEntityById(id: Long): Boolean
+}

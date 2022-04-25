@@ -44,4 +44,12 @@ class ShelterController(
             false -> ResponseEntity(HttpStatus.BAD_REQUEST)
         }
     }
+
+    @DeleteMapping("{id}")
+    fun deleteAnimal(@PathVariable id: Long): ResponseEntity<Unit> {
+        return when (shelterService.deleteAnimal(id)) {
+            true -> ResponseEntity(HttpStatus.NO_CONTENT)
+            false -> ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
 }
