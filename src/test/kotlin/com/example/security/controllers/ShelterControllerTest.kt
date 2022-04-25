@@ -5,7 +5,6 @@ import com.example.security.models.dtos.AnimalDto
 import com.example.security.models.dtos.AnimalRegistrationDto
 import com.example.security.models.entities.AnimalEntity
 import com.example.security.models.entities.AnimalType
-import com.example.security.models.entities.AnimalType.HEDGEHOG
 import com.example.security.services.ShelterService
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.wrongwrong.mapk.core.KMapper
@@ -20,7 +19,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.*
 import java.util.*
-import kotlin.reflect.KFunction
 
 @WebMvcTest
 @ActiveProfiles("controller-test")

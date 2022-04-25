@@ -1,7 +1,7 @@
 package com.example.security.services
 
-import com.example.security.models.dtos.AnimalDto
 import com.example.security.models.dtos.AnimalRegistrationDto
+import com.example.security.models.dtos.AnimalUpdateDto
 import com.example.security.models.entities.AnimalEntity
 import com.example.security.repos.ShelterRepo
 import com.wrongwrong.mapk.core.KMapper
@@ -32,8 +32,9 @@ class ShelterService(
         return shelterRepo.findById(id)
     }
 
-    fun updateAnimal(id: Long, animal: AnimalDto): Boolean {
+    fun updateAnimal(id: Long, animal: AnimalUpdateDto): Boolean {
         if (shelterRepo.findById(id).isEmpty) return false
+
         val updatedAnimal = KMapper(::AnimalEntity)
             .map(animal, mapOf("id" to id))
         shelterRepo.save(updatedAnimal)

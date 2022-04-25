@@ -29,9 +29,6 @@ class SecurityTest(
     @Autowired
     private var env: Environment
 ) {
-
-
-
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -56,7 +53,6 @@ class SecurityTest(
 
     @Test
     fun basicLoginTest() {
-
         val result = mockMvc.perform(
             post("/login")
                 .contentType(APPLICATION_FORM_URLENCODED)

@@ -2,6 +2,7 @@ package com.example.security.controllers
 
 import com.example.security.models.dtos.AnimalDto
 import com.example.security.models.dtos.AnimalRegistrationDto
+import com.example.security.models.dtos.AnimalUpdateDto
 import com.example.security.models.entities.AnimalEntity
 import com.example.security.services.ShelterService
 import com.wrongwrong.mapk.core.KMapper
@@ -42,7 +43,7 @@ class ShelterController(
     }
 
     @PutMapping("{id}")
-    fun updateAnimal(@PathVariable id: Long, @RequestBody animal: AnimalDto): ResponseEntity<Unit> {
+    fun updateAnimal(@PathVariable id: Long, @RequestBody animal: AnimalUpdateDto): ResponseEntity<Unit> {
         return when (shelterService.updateAnimal(id, animal)) {
             true -> ResponseEntity(HttpStatus.NO_CONTENT)
             false -> ResponseEntity(HttpStatus.NOT_FOUND)

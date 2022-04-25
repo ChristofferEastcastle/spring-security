@@ -9,6 +9,7 @@ class UserEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     val id: Long? = null,
+    @Column(unique = true)
     val username: String,
     val password: String,
     val enabled: Boolean,
