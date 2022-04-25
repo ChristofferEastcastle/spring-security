@@ -21,7 +21,7 @@ class InitialSetup(
 ) {
 
     @Profile("!controller-test")
-    @Bean
+
     fun init(@Autowired userService: UserService) = CommandLineRunner {
         val adminAuthority = userService.createAuthority(AuthorityEntity(name = "ADMIN"))
         val admin = tryGetAdminUser()

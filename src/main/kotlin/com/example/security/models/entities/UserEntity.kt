@@ -7,7 +7,7 @@ import javax.persistence.*
 class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     val id: Long? = null,
     val username: String,
     val password: String,

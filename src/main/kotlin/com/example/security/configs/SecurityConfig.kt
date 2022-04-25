@@ -45,8 +45,9 @@ class SecurityConfig(
 
     override fun configure(http: HttpSecurity) {
         if (env.activeProfiles.contains("test")) {
-            http.csrf().disable()
         }
+        http.csrf().disable()
+
         val authFilter = CustomAuthenticationFilter(authenticationManagerBean())
         http
             .addFilter(authFilter)
@@ -68,9 +69,13 @@ class SecurityConfig(
             .permitAll().and().apply(AdditionalFormLoginConfigurer())*/
         http
             .authorizeRequests()
+            .antMatchers("/api/shelter/**")
+            .permitAll()
             .antMatchers("/api/users/**").hasAuthority(ADMIN.name)
             .anyRequest()
             .authenticated()
+
+
 
 
         http
