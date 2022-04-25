@@ -35,7 +35,8 @@ class UserControllerTest(@Autowired val userService: UserService) {
     @Test
     fun testGetUsers() {
         every { userService.fetchAllUsers() } answers {
-            users.map { UserEntity(it.id, it.username, password = "not needed", it.enabled) }
+            users.map { KMapper(::UserEntity).map(it,
+                mapOf("password" to "not_needed")) }
         }
 
         val result = mockMvc.get("/api/users")
@@ -58,8 +59,14 @@ class UserControllerTest(@Autowired val userService: UserService) {
         mockMvc.get("/api/users/1")
             .andExpect { status { isOk() } }
             .andExpect { content { contentType(APPLICATION_JSON) } }
-            .andExpect { content { json(jacksonObjectMapper()
-                .writeValueAsString(KMapper(::UserDto).map(userEntity))) } }
+            .andExpect {
+                content {
+                    json(
+                        jacksonObjectMapper()
+                            .writeValueAsString(KMapper(::UserDto).map(userEntity))
+                    )
+                }
+            }
 
     }
 }

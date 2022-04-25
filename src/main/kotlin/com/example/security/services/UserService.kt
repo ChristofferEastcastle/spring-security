@@ -7,12 +7,12 @@ import com.example.security.models.entities.UserEntity
 import com.example.security.repos.AuthorityRepo
 import com.example.security.repos.UserRepo
 import com.wrongwrong.mapk.core.KMapper
+import org.apache.tomcat.websocket.AuthenticationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
@@ -29,7 +29,7 @@ class UserService(
             val user = userRepo.findByUsername(username)
             return User(user.username, user.password, user.authorities.map { SimpleGrantedAuthority(it.name) })
         } catch (e: Exception) {
-            throw UsernameNotFoundException("Error authenticating user")
+            throw AuthenticationException("Error authenticating user")
         }
     }
 

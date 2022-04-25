@@ -9,6 +9,7 @@ import com.wrongwrong.mapk.core.KMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -17,6 +18,7 @@ class ShelterController(
     @Autowired private val shelterService: ShelterService
 ) {
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER', 'TRAINEE')")
     @GetMapping()
     fun retrieveAllAnimals(): ResponseEntity<List<AnimalDto>> {
         val animals = shelterService.retrieveAllAnimals()
@@ -25,6 +27,7 @@ class ShelterController(
         return ResponseEntity(animals, HttpStatus.OK)
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER', 'TRAINEE')")
     @GetMapping("{id}")
     fun retrieveAnimal(@PathVariable id: Long): ResponseEntity<AnimalEntity> {
         val animal = shelterService.retrieveAnimal(id)
@@ -37,11 +40,13 @@ class ShelterController(
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     @PostMapping
     fun registerAnimal(@RequestBody animal: AnimalRegistrationDto): ResponseEntity<AnimalEntity> {
         return ResponseEntity(shelterService.registerAnimal(animal), HttpStatus.CREATED)
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     @PutMapping("{id}")
     fun updateAnimal(@PathVariable id: Long, @RequestBody animal: AnimalUpdateDto): ResponseEntity<Unit> {
         return when (shelterService.updateAnimal(id, animal)) {
@@ -50,6 +55,7 @@ class ShelterController(
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("{id}")
     fun deleteAnimal(@PathVariable id: Long): ResponseEntity<Unit> {
         return when (shelterService.deleteAnimal(id)) {

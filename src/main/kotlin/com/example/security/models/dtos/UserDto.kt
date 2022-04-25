@@ -7,5 +7,5 @@ data class UserDto(
     val id: Long? = null,
     val username: String,
     val enabled: Boolean,
-    val authorities: List<Authorities>? = null
+    val authorities: List<Authorities> = mutableListOf()
 )

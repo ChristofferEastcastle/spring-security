@@ -8,11 +8,11 @@ import com.example.security.repos.AuthorityRepo
 import com.example.security.repos.UserRepo
 import io.mockk.every
 import io.mockk.mockk
+import org.apache.tomcat.websocket.AuthenticationException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 internal class UserServiceTest {
 
@@ -51,7 +51,7 @@ internal class UserServiceTest {
             throw Exception()
         }
 
-        assertThatExceptionOfType(UsernameNotFoundException::class.java)
+        assertThatExceptionOfType(AuthenticationException::class.java)
             .isThrownBy { userService.loadUserByUsername(username) }
             .withMessage("Error authenticating user")
     }

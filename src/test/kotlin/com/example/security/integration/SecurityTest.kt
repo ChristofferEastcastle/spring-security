@@ -1,8 +1,15 @@
 package com.example.security.integration
 
+import com.example.security.configs.SecurityConfig.Companion.LOGIN_URL
+import com.example.security.models.dtos.UserRegistrationDto
+import com.example.security.models.entities.UserEntity
+import com.example.security.repos.UserRepo
+import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -22,18 +29,31 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import javax.servlet.http.Cookie
 
+
 @SpringBootTest
 @ActiveProfiles("security-test")
 @AutoConfigureMockMvc
 class SecurityTest(
     @Autowired
-    private var env: Environment
+    private var env: Environment,
+    @Autowired private val userRepo: UserRepo,
+    @Autowired private val userService: UserService
 ) {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    private val username: String = env.getProperty("TEST_USERNAME")!!
-    private val password: String = env.getProperty("TEST_PASSWORD")!!
+    //private val username: String = env.getProperty("TEST_USERNAME")!!
+    //private val password: String = env.getProperty("TEST_PASSWORD")!!
+    val username = "administrator"
+    val password = "super_secret"
+
+    @BeforeEach
+    fun init() {
+        userRepo.deleteAll()
+        userService.registerUser(
+            UserRegistrationDto(username = username, password = password)
+        )
+    }
 
     @Test
     fun failBasicLoginTest() {
@@ -41,7 +61,7 @@ class SecurityTest(
         val password = "no_password"
 
         val result = mockMvc.perform(
-            post("/login")
+            post(LOGIN_URL)
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("username", username)
                 .param("password", password)
@@ -54,7 +74,7 @@ class SecurityTest(
     @Test
     fun basicLoginTest() {
         val result = mockMvc.perform(
-            post("/login")
+            post(LOGIN_URL)
                 .contentType(APPLICATION_FORM_URLENCODED)
                 .param("username", username)
                 .param("password", password)
@@ -102,6 +122,7 @@ class SecurityTest(
             .andExpect { status { isUnauthorized() } }
             .andExpect { content { string(errorMessage) } }
     }
+
     // Using this class to create a fake JWT token to test security
     @Service
     class UserDetailsCreator : UserDetailsService {

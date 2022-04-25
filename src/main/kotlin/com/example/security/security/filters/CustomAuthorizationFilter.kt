@@ -3,10 +3,12 @@ package com.example.security.security.filters
 import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.apache.tomcat.websocket.AuthenticationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -36,7 +38,10 @@ class CustomAuthorizationFilter(
             val decodedToken = JwtUtil.decodeToken(token = token.value)
             val username = decodedToken.subject
             // This depends on unique username for the whole system
-            userService.loadUserByUsername(username)
+            val fromDb = userService.loadUserByUsername(username)
+            if (fromDb.username != username) {
+                throw AuthenticationException("Error authenticating user!")
+            }
 
             val authority = decodedToken.getClaim("authorities").asList(String::class.java)
                 .map { SimpleGrantedAuthority(it) }

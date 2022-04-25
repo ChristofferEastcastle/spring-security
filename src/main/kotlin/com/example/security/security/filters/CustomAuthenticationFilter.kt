@@ -36,7 +36,6 @@ class CustomAuthenticationFilter(
         response.addCookie(Cookie("access_token", accessToken))
         response.addHeader("Location", "/")
         response.status = HttpStatus.FOUND.value()
-        response.sendRedirect("/")
         chain.doFilter(request, response)
     }
 }
