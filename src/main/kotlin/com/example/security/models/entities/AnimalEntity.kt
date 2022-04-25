@@ -18,5 +18,5 @@ class AnimalEntity(
 )
 
 enum class AnimalType {
-    TIGER, LION, GIRAFFE
+    TIGER, LION, GIRAFFE, HEDGEHOG
 }

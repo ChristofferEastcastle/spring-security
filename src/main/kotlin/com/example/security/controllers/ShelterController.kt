@@ -45,7 +45,7 @@ class ShelterController(
     fun updateAnimal(@PathVariable id: Long, @RequestBody animal: AnimalDto): ResponseEntity<Unit> {
         return when (shelterService.updateAnimal(id, animal)) {
             true -> ResponseEntity(HttpStatus.NO_CONTENT)
-            false -> ResponseEntity(HttpStatus.BAD_REQUEST)
+            false -> ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
 
