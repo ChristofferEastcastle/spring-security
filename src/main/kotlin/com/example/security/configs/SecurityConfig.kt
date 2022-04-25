@@ -44,12 +44,9 @@ class SecurityConfig(
     }
 
     override fun configure(http: HttpSecurity) {
-        if (env.activeProfiles.contains("test")) {
-        }
-        http.csrf().disable()
-
         val authFilter = CustomAuthenticationFilter(authenticationManagerBean())
         http
+            .csrf().disable()
             .addFilter(authFilter)
             .sessionManagement()
             // No need for session because we are using our own JWT to control this.
@@ -60,13 +57,6 @@ class SecurityConfig(
             .antMatchers("/api/auth/register", "/api/auth/login")
             .permitAll()
 
-        //noAuthPages.forEach { http.authorizeRequests().antMatchers(it).permitAll() }
-        /*http
-            .formLogin()
-            .loginPage(LOGIN_PAGE_URL)
-            .loginProcessingUrl(LOGIN_PROCESSING_URL)
-            .successForwardUrl("/api/users")
-            .permitAll().and().apply(AdditionalFormLoginConfigurer())*/
         http
             .authorizeRequests()
             .antMatchers("/api/shelter/**")
@@ -75,16 +65,12 @@ class SecurityConfig(
             .anyRequest()
             .authenticated()
 
-
-
-
         http
             .addFilterBefore(CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter::class.java)
             .logout()
             .logoutUrl("/api/logout")
             .logoutSuccessUrl("/api/login")
             .deleteCookies("access_token")
-            .and()
     }
 
     @Bean

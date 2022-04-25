@@ -4,6 +4,7 @@ import com.example.security.models.dtos.AnimalDto
 import com.example.security.models.dtos.AnimalRegistrationDto
 import com.example.security.models.entities.AnimalEntity
 import com.example.security.repos.ShelterRepo
+import com.wrongwrong.mapk.core.KMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -33,13 +34,8 @@ class ShelterService(
 
     fun updateAnimal(id: Long, animal: AnimalDto): Boolean {
         if (shelterRepo.findById(id).isEmpty) return false
-        val updatedAnimal = AnimalEntity(
-            id,
-            animal.name,
-            animal.type,
-            animal.age,
-            animal.health
-        )
+        val updatedAnimal = KMapper(::AnimalEntity)
+            .map(animal, mapOf("id" to id))
         shelterRepo.save(updatedAnimal)
         return true
     }
