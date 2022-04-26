@@ -50,7 +50,7 @@ class CustomAuthorizationFilter(
 
         } catch (e: Exception) {
             val error = when (e) {
-                is UsernameNotFoundException -> mapOf("error_message" to e.message)
+                is AuthenticationException -> mapOf("error_message" to e.message)
                 else -> mapOf("error_message" to "access token invalid!")
             }
             logger.error("Authorization ERROR: ${e.message}")

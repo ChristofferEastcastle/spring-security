@@ -38,31 +38,12 @@ import javax.servlet.http.Cookie
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = NONE)
-class SecurityTest(
-    @Autowired
-    private var env: Environment,
-    @Autowired private val userRepo: UserRepo,
-    @Autowired private val userService: UserService,
-//    @Autowired private val passwordEncoder: BCryptPasswordEncoder,
-    @Autowired private val authorityRepo: AuthorityRepo
-) {
+class SecurityTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    //private val username: String = env.getProperty("TEST_USERNAME")!!
-    //private val password: String = env.getProperty("TEST_PASSWORD")!!
     val username = "administrator"
     val password = "super_secret"
-
-    @BeforeEach
-    fun init() {
-        println(userRepo.findAll())
-        userRepo.deleteAll()
-        //userService.registerUser(
-        //    UserRegistrationDto(username = username, passwordEncoder.encode(password))
-        //)
-        userService.grantAuthorityToUser(username, "ADMIN")
-    }
 
     @Test
     fun failBasicLoginTest() {

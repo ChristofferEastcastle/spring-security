@@ -20,5 +20,3 @@ spring:
     enabled: true
 
 COOKIE_SECRET: ldjaflskdfldskfj
-TEST_PASSWORD: test_password
-TEST_USERNAME: tester

@@ -12,16 +12,16 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import kotlin.test.assertEquals
 
 
 @DataJpaTest
-@ActiveProfiles("security-test")
+@ActiveProfiles("test")
 @ContextConfiguration(classes = [UserRepo::class])
 @EnableJpaRepositories(basePackages = ["com.example.security.*"])
 @EntityScan("com.example.security.models")
 
-class UserRepoTest(
-) {
+class UserRepoTest {
     @Autowired
     private lateinit var userRepo: UserRepo
 
@@ -41,9 +41,21 @@ class UserRepoTest(
 
     @Test
     fun doNotFindByUsernameTest() {
-        assertThatThrownBy { userRepo.findByUsername("something") }
+        assertEquals(
+            null, userRepo.findByUsername("something")
+        )
+    }
+
+    @Test
+    fun findById() {
+        assertThat(userRepo.findById(1))
             .isNotNull
-            .hasMessage("Result must not be null!")
-            .isInstanceOf(EmptyResultDataAccessException::class.java)
+            .isNotEmpty
+    }
+
+    @Test
+    fun doNotFindById() {
+        assertThat(userRepo.findById(8271398723))
+            .isEmpty
     }
 }
