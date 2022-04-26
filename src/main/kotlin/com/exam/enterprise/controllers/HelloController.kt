@@ -10,15 +10,15 @@ import javax.servlet.http.HttpServletResponse
 class HelloController {
 
     @GetMapping("/")
-    fun hello(): String {
-        return "Hello!"
+    fun rootRedirect(req: HttpServletRequest, res: HttpServletResponse) {
+        res.sendRedirect("/api")
     }
 
     @GetMapping("/api")
     fun welcomeMessage(req: HttpServletRequest, res: HttpServletResponse) {
         jacksonObjectMapper().writeValue(
             res.writer,
-            mapOf("welcome_message" to "Welcome to the API!")
+            mapOf("welcome_message" to "Welcome to the Animal Shelter API!")
         )
     }
 }
