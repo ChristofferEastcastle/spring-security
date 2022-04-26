@@ -1,9 +1,8 @@
 package com.example.security.security.filters
 
+import com.example.security.configs.SecurityConfig.Companion.HOST
 import com.example.security.utils.JwtUtil
-import org.jboss.logging.Logger
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -32,7 +31,7 @@ class CustomAuthenticationFilter(
         authResult: Authentication
     ) {
         val user = authResult.principal as User
-        val accessToken = JwtUtil.createToken(user, issuer = request.servletPath, minutes = 10)
+        val accessToken = JwtUtil.createToken(user, issuer = HOST, minutes = 10)
         response.addCookie(Cookie("access_token", accessToken))
         chain.doFilter(request, response)
     }

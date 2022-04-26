@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
-import org.springframework.core.env.Environment
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -21,17 +21,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 
-
 @EnableWebSecurity
 @Configuration
 class SecurityConfig(
 
     @Qualifier("userService") @Autowired private val userDetailsService: UserDetailsService,
     @Autowired private val userService: UserService,
-    @Lazy @Autowired private val passwordEncoder: BCryptPasswordEncoder,
-    @Autowired private val env: Environment
+    @Lazy @Autowired private val passwordEncoder: BCryptPasswordEncoder
 ) : WebSecurityConfigurerAdapter() {
     companion object {
+        const val HOST = "localhost:8080/api"
         const val LOGIN_URL = "/api/authentication/login"
         const val REGISTER_URL = "/api/authentication/register"
         const val LOGOUT_URL = "/api/authentication/logout"
@@ -58,12 +57,12 @@ class SecurityConfig(
         http
             .addFilter(authFilter)
             .authorizeRequests()
-            .antMatchers("/", REGISTER_URL, LOGIN_URL).permitAll()
-            .antMatchers("/api/shelter/**").hasAuthority(ADMIN.name)
-            .antMatchers("/api/users/**").hasAuthority(ADMIN.name)
-            .antMatchers("/api/authentication/register").hasAuthority(ADMIN.name)
+            .antMatchers(HttpMethod.GET,"/", REGISTER_URL, LOGIN_URL).permitAll()
+            .antMatchers("/api/users/**").hasAnyAuthority(ADMIN.name)
+            .antMatchers("/api/shelter/**").hasAnyAuthority(ADMIN.name)
             .anyRequest()
             .authenticated()
+
 
         http
             .addFilterBefore(CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter::class.java)
@@ -71,8 +70,6 @@ class SecurityConfig(
             .logoutUrl(LOGOUT_URL)
             .logoutSuccessUrl("/")
             .deleteCookies("access_token")
-            .and()
-            .formLogin().disable()
 
     }
 

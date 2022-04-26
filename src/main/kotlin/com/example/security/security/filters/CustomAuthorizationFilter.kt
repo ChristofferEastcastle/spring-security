@@ -10,7 +10,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.web.filter.OncePerRequestFilter
 import javax.servlet.FilterChain
 import javax.servlet.http.Cookie
@@ -36,11 +35,9 @@ class CustomAuthorizationFilter(
         try {
             val decodedToken = JwtUtil.decodeToken(token = token.value)
             val username = decodedToken.subject
-            // This depends on unique username for the whole system
-            val fromDb = userService.loadUserByUsername(username)
-            if (fromDb.username != username) {
-                throw AuthenticationException("Error authenticating user!")
-            }
+            // This depends on unique username for the whole system.
+            // Will throw exception if username does not exist.
+            userService.loadUserByUsername(username)
 
             val authorities = decodedToken.getClaim("authorities").asList(String::class.java)
                 .map { SimpleGrantedAuthority(it) }
