@@ -4,9 +4,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class SecurityApplication
+class AnimalShelterApplication
 
 
 fun main(args: Array<String>) {
-    runApplication<SecurityApplication>(*args)
+    runApplication<AnimalShelterApplication>(*args)
 }
