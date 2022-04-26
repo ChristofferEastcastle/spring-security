@@ -8,7 +8,7 @@ import java.util.*
 
 @Repository
 interface UserRepo : JpaRepository<UserEntity, Long>{
-    fun findByUsername(username: String?): UserEntity
+    fun findByUsername(username: String): UserEntity?
 
     override fun findById(id: Long): Optional<UserEntity>
 }

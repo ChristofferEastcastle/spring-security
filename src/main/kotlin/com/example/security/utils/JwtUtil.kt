@@ -22,7 +22,7 @@ class CookieSecretInitializer: CommandLineRunner {
     private val cookieSecretStr = "COOKIE_SECRET"
 
     override fun run(vararg args: String?) {
-        cookieSecret = if (env.activeProfiles.contains("security-test"))
+        cookieSecret = if (env.activeProfiles.contains("test"))
             env.getProperty(cookieSecretStr)
         else
             System.getenv()[cookieSecretStr]

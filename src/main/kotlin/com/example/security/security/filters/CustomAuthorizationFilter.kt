@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -43,9 +42,9 @@ class CustomAuthorizationFilter(
                 throw AuthenticationException("Error authenticating user!")
             }
 
-            val authority = decodedToken.getClaim("authorities").asList(String::class.java)
+            val authorities = decodedToken.getClaim("authorities").asList(String::class.java)
                 .map { SimpleGrantedAuthority(it) }
-            val authToken = UsernamePasswordAuthenticationToken(username, null, authority)
+            val authToken = UsernamePasswordAuthenticationToken(username, null, authorities)
             SecurityContextHolder.getContext().authentication = authToken
             filterChain.doFilter(request, response)
 

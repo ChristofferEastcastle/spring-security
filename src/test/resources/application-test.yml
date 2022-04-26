@@ -12,7 +12,13 @@ spring:
 
     username: localdevuser
     password: pirate
-    driverClassName: org.postgresql.Driver
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
   sql:
     init:
     platform: localdevdb
+  flyway:
+    enabled: true
+
+COOKIE_SECRET: ldjaflskdfldskfj
+TEST_PASSWORD: test_password
+TEST_USERNAME: tester

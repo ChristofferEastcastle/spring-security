@@ -34,8 +34,6 @@ class CustomAuthenticationFilter(
         val user = authResult.principal as User
         val accessToken = JwtUtil.createToken(user, issuer = request.servletPath, minutes = 10)
         response.addCookie(Cookie("access_token", accessToken))
-        response.addHeader("Location", "/")
-        response.status = HttpStatus.FOUND.value()
         chain.doFilter(request, response)
     }
 }

@@ -27,7 +27,7 @@ class UserService(
     override fun loadUserByUsername(username: String): UserDetails {
         try {
             val user = userRepo.findByUsername(username)
-            return User(user.username, user.password, user.authorities.map { SimpleGrantedAuthority(it.name) })
+            return User(user?.username, user?.password, user?.authorities?.map { SimpleGrantedAuthority(it.name) })
         } catch (e: Exception) {
             throw AuthenticationException("Error authenticating user")
         }
@@ -46,9 +46,10 @@ class UserService(
     }
 
     fun grantAuthorityToUser(username: String, authorityName: String) {
-        val user = userRepo.findByUsername(username)
-        val authority = authorityRepo.findByName(authorityName)
-        authority?.let { user.authorities.add(it) }
+        val user = userRepo.findByUsername(username) ?: return
+        val authority = authorityRepo.findByName(authorityName) ?: return
+
+        user.authorities.add(authority)
         userRepo.save(user)
     }
 

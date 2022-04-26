@@ -3,6 +3,7 @@ package com.example.security.integration
 import com.example.security.configs.SecurityConfig.Companion.LOGIN_URL
 import com.example.security.models.dtos.UserRegistrationDto
 import com.example.security.models.entities.UserEntity
+import com.example.security.repos.AuthorityRepo
 import com.example.security.repos.UserRepo
 import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.env.Environment
@@ -22,6 +25,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -31,13 +35,16 @@ import javax.servlet.http.Cookie
 
 
 @SpringBootTest
-@ActiveProfiles("security-test")
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
+@AutoConfigureTestDatabase(replace = NONE)
 class SecurityTest(
     @Autowired
     private var env: Environment,
     @Autowired private val userRepo: UserRepo,
-    @Autowired private val userService: UserService
+    @Autowired private val userService: UserService,
+//    @Autowired private val passwordEncoder: BCryptPasswordEncoder,
+    @Autowired private val authorityRepo: AuthorityRepo
 ) {
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -49,10 +56,12 @@ class SecurityTest(
 
     @BeforeEach
     fun init() {
+        println(userRepo.findAll())
         userRepo.deleteAll()
-        userService.registerUser(
-            UserRegistrationDto(username = username, password = password)
-        )
+        //userService.registerUser(
+        //    UserRegistrationDto(username = username, passwordEncoder.encode(password))
+        //)
+        userService.grantAuthorityToUser(username, "ADMIN")
     }
 
     @Test

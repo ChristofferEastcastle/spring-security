@@ -25,9 +25,9 @@ values (default, 'administrator',
 
 insert into users_authorities
 values ((select id from users where username = 'administrator'),
-        (select id from localdevdb.public.authorities where name = 'ADMIN')),
+        (select id from authorities where name = 'ADMIN')),
        ((select id from users where username = 'regular_user'),
-        (select id from localdevdb.public.authorities where name = 'USER')),
+        (select id from authorities where name = 'USER')),
        ((select id from users where username = 'useless_trainee'),
-        (select id from localdevdb.public.authorities where name = 'TRAINEE'))
+        (select id from authorities where name = 'TRAINEE'))
 

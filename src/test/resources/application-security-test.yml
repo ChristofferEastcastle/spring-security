@@ -8,9 +8,9 @@ spring:
         url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
         username: sa
     flyway:
-        enabled: false
+        enabled: true
     jpa:
         database: h2
         hibernate:
-            ddl-auto: create-drop
+            ddl-auto: none
         show-sql: true
