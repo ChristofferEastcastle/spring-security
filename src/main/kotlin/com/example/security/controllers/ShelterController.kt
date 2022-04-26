@@ -17,7 +17,7 @@ class ShelterController(
     @Autowired private val shelterService: ShelterService
 ) {
 
-    @GetMapping()
+    @GetMapping("/animals")
     fun retrieveAllAnimals(): ResponseEntity<List<AnimalDto>> {
         val animals = shelterService.retrieveAllAnimals()
             .map { KMapper(::AnimalDto).map(it) }
@@ -25,7 +25,7 @@ class ShelterController(
         return ResponseEntity(animals, HttpStatus.OK)
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/animals/{id}")
     fun retrieveAnimal(@PathVariable id: Long): ResponseEntity<AnimalEntity> {
         val animal = shelterService.retrieveAnimal(id)
         return when {
@@ -37,12 +37,12 @@ class ShelterController(
         }
     }
 
-    @PostMapping
+    @PostMapping("/animals")
     fun registerAnimal(@RequestBody animal: AnimalRegistrationDto): ResponseEntity<AnimalEntity> {
         return ResponseEntity(shelterService.registerAnimal(animal), HttpStatus.CREATED)
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/animals/{id}")
     fun updateAnimal(@PathVariable id: Long, @RequestBody animal: AnimalUpdateDto): ResponseEntity<Unit> {
         return when (shelterService.updateAnimal(id, animal)) {
             true -> ResponseEntity(HttpStatus.NO_CONTENT)
@@ -50,7 +50,7 @@ class ShelterController(
         }
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/animals/{id}")
     fun deleteAnimal(@PathVariable id: Long): ResponseEntity<Unit> {
         return when (shelterService.deleteAnimal(id)) {
             true -> ResponseEntity(HttpStatus.NO_CONTENT)

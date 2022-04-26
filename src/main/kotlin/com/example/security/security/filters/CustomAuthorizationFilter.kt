@@ -1,9 +1,9 @@
 package com.example.security.security.filters
 
+import com.example.security.exceptions.CouldNotAuthenticateException
 import com.example.security.services.UserService
 import com.example.security.utils.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.apache.tomcat.websocket.AuthenticationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -47,7 +47,7 @@ class CustomAuthorizationFilter(
 
         } catch (e: Exception) {
             val error = when (e) {
-                is AuthenticationException -> mapOf("error_message" to e.message)
+                is CouldNotAuthenticateException -> mapOf("error_message" to e.message)
                 else -> mapOf("error_message" to "access token invalid!")
             }
             logger.error("Authorization ERROR: ${e.message}")
@@ -55,6 +55,7 @@ class CustomAuthorizationFilter(
             response.status = UNAUTHORIZED.value()
             val cookie = Cookie("access_token", null)
             cookie.maxAge = 0
+            cookie.path = "/api"
             response.addCookie(cookie)
             jacksonObjectMapper().writeValue(response.outputStream, error)
         }

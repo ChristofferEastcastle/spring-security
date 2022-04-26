@@ -1,5 +1,6 @@
 package com.example.security.services
 
+import com.example.security.exceptions.CouldNotAuthenticateException
 import com.example.security.models.dtos.UserRegistrationDto
 import com.example.security.models.entities.Authorities
 import com.example.security.models.entities.AuthorityEntity
@@ -8,17 +9,18 @@ import com.example.security.repos.AuthorityRepo
 import com.example.security.repos.UserRepo
 import io.mockk.every
 import io.mockk.mockk
-import org.apache.tomcat.websocket.AuthenticationException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 internal class UserServiceTest {
 
     private val userRepo = mockk<UserRepo>()
     private val authorityRepo = mockk<AuthorityRepo>()
-    private val userService = UserService(userRepo, authorityRepo)
+    private val passwordEncoder = mockk<BCryptPasswordEncoder>()
+    private val userService = UserService(userRepo, authorityRepo, passwordEncoder)
 
 
     @Test
@@ -51,9 +53,9 @@ internal class UserServiceTest {
             throw Exception()
         }
 
-        assertThatExceptionOfType(AuthenticationException::class.java)
+        assertThatExceptionOfType(CouldNotAuthenticateException::class.java)
             .isThrownBy { userService.loadUserByUsername(username) }
-            .withMessage("Error authenticating user")
+            .withMessage(CouldNotAuthenticateException().message)
     }
 
     @Test
@@ -68,6 +70,8 @@ internal class UserServiceTest {
         every { authorityRepo.findByName(any()) } answers {
             AuthorityEntity(name = Authorities.USER.name)
         }
+        every { userRepo.existsByUsername(any()) } answers { false }
+        every { passwordEncoder.encode(any()) } answers {"password"}
         val registered = userService.registerUser(userToSave)
 
         assertThat(registered)

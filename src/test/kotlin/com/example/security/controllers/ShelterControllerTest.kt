@@ -34,7 +34,7 @@ class ShelterControllerTest(
     private val testAnimal2 = AnimalEntity(2, name = "Catwoman", AnimalType.TIGER, 27, 100 * 9)
     private val mapper = jacksonObjectMapper()
 
-    private val path = "/api/shelter"
+    private val path = "/api/shelter/animals"
 
     @Test
     fun retrieveAllAnimals() {

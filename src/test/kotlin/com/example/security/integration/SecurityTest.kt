@@ -1,23 +1,16 @@
 package com.example.security.integration
 
-import com.example.security.configs.SecurityConfig.Companion.LOGIN_URL
-import com.example.security.models.dtos.UserRegistrationDto
-import com.example.security.models.entities.UserEntity
-import com.example.security.repos.AuthorityRepo
-import com.example.security.repos.UserRepo
-import com.example.security.services.UserService
+import com.example.security.security.SecurityConfig.Companion.LOGIN_URL
+import com.example.security.exceptions.CouldNotAuthenticateException
 import com.example.security.utils.JwtUtil
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -25,7 +18,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -89,12 +81,18 @@ class SecurityTest {
             issuer = "tester.com", minutes = 10
         )
 
-        val errorMessage = "{\"error_message\":\"Error authenticating user\"}"
-        mockMvc.get("/") {
+        val errorMessage =
+            jacksonObjectMapper().writeValueAsString(
+                mapOf(
+                    "error_message" to CouldNotAuthenticateException().message.toString()
+                )
+            )
+
+        mockMvc.get("/api/users") {
             cookie(Cookie("access_token", token))
         }
             .andExpect { status { isUnauthorized() } }
-            .andExpect { content { string(errorMessage) } }
+            .andExpect { content { json(errorMessage) } }
 
     }
 
@@ -106,7 +104,7 @@ class SecurityTest {
         ).substring(2)
 
         val errorMessage = jacksonObjectMapper().writeValueAsString(mapOf("error_message" to "access token invalid!"))
-        mockMvc.get("/") {
+        mockMvc.get("/api/users") {
             cookie(Cookie("access_token", token))
         }
             .andExpect { status { isUnauthorized() } }

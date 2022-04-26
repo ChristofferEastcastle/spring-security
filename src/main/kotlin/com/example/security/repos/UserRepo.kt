@@ -11,4 +11,6 @@ interface UserRepo : JpaRepository<UserEntity, Long>{
     fun findByUsername(username: String): UserEntity?
 
     override fun findById(id: Long): Optional<UserEntity>
+
+    fun existsByUsername(username: String): Boolean
 }

@@ -1,6 +1,6 @@
-package com.example.security.configs
+package com.example.security.security
 
-import com.example.security.models.entities.Authorities.ADMIN
+import com.example.security.models.entities.Authorities.*
 import com.example.security.security.filters.CustomAuthenticationFilter
 import com.example.security.security.filters.CustomAuthorizationFilter
 import com.example.security.services.UserService
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
+import org.springframework.http.HttpMethod.*
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -29,9 +30,10 @@ class SecurityConfig(
     @Lazy @Autowired private val passwordEncoder: BCryptPasswordEncoder
 ) : WebSecurityConfigurerAdapter() {
     companion object {
-        const val HOST = "localhost:8080/api"
-        const val LOGIN_URL = "/api/login"
-        const val LOGOUT_URL = "/api/logout"
+        const val LOGIN_URL = "/api/authentication/login"
+        const val LOGIN_PAGE = "/api/authentication/login-page"
+        const val REGISTER_URL = "/api/authentication/register"
+        const val LOGOUT_URL = "/api/authentication/logout"
     }
 
     @Bean
@@ -55,23 +57,25 @@ class SecurityConfig(
         http
             .addFilter(authFilter)
             .authorizeRequests()
-            .antMatchers("/", "/api/login", "/api/login-page").permitAll()
+            .antMatchers("/", LOGIN_URL, LOGIN_PAGE, REGISTER_URL).permitAll()
             .antMatchers("/api/users/**").hasAnyAuthority(ADMIN.name)
-            .antMatchers("/api/shelter/**").hasAnyAuthority(ADMIN.name)
+            .antMatchers(GET, "/api/shelter/animals/**").hasAnyAuthority(ADMIN.name, USER.name, TRAINEE.name)
+            .antMatchers(POST, "/api/shelter/animals").hasAnyAuthority(ADMIN.name, USER.name)
+            .antMatchers(DELETE, "/api/shelter/animals").hasAnyAuthority(ADMIN.name)
+            .antMatchers("/api/shelter/**").hasAnyAuthority(ADMIN.name, USER.name)
             .anyRequest()
             .authenticated()
-
 
         http
             .addFilterBefore(CustomAuthorizationFilter(userService), UsernamePasswordAuthenticationFilter::class.java)
             .logout()
             .logoutUrl(LOGOUT_URL)
-            .logoutSuccessUrl("/")
+            .logoutSuccessUrl(LOGIN_PAGE)
             .deleteCookies("access_token")
             .and()
             .formLogin()
             .loginProcessingUrl(LOGIN_URL)
-            .loginPage("/api/login-page")
+            .loginPage(LOGIN_PAGE)
     }
 
     @Bean

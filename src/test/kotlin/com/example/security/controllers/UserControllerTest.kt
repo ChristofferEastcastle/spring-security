@@ -27,6 +27,7 @@ class UserControllerTest(@Autowired val userService: UserService) {
     private val userTwo = UserDto(id = 2, username = "test2", enabled = true)
     private val users = listOf(userOne, userTwo)
 
+
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -35,8 +36,12 @@ class UserControllerTest(@Autowired val userService: UserService) {
     @Test
     fun testGetUsers() {
         every { userService.fetchAllUsers() } answers {
-            users.map { KMapper(::UserEntity).map(it,
-                mapOf("password" to "not_needed")) }
+            users.map {
+                KMapper(::UserEntity).map(
+                    it,
+                    mapOf("password" to "not_needed")
+                )
+            }
         }
 
         val result = mockMvc.get("/api/users")
@@ -67,6 +72,5 @@ class UserControllerTest(@Autowired val userService: UserService) {
                     )
                 }
             }
-
     }
 }
