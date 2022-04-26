@@ -33,12 +33,6 @@ internal class ShelterServiceTest {
 
     @Test
     fun registerAnimal() {
-        /*val animalToRegister = AnimalRegistrationDto(
-            name = "Batman",
-            type = AnimalType.GIRAFFE,
-            age = 68,
-            health = 299
-        )*/
         val animalToRegister = KMapper(::AnimalRegistrationDto)
             .map(testAnimal1)
 

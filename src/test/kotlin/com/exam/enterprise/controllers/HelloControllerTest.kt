@@ -20,7 +20,7 @@ class HelloControllerTest{
     @Test
     fun helloTest() {
         mockMvc.get("/")
-            .andExpect { status { isOk() } }
-            .andExpect { content { string("Hello!") } }
+            .andExpect { status { isFound() } }
+            .andExpect { header { string("Location", "/api") } }
     }
 }
