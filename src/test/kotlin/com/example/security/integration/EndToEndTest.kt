@@ -1,9 +1,13 @@
 package com.example.security.integration
 
+import com.example.security.models.dtos.AnimalDto
+import com.example.security.models.dtos.AnimalRegistrationDto
 import com.example.security.models.dtos.UserRegistrationDto
+import com.example.security.models.entities.AnimalType.HEDGEHOG
 import com.example.security.security.SecurityConfig.Companion.LOGIN_URL
 import com.example.security.security.SecurityConfig.Companion.REGISTER_URL
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.wrongwrong.mapk.core.KMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,5 +51,35 @@ class EndToEndTest {
         }
             .andExpect { status { isFound() } }
             .andExpect { cookie { exists("access_token") } }
+    }
+    // This test is also confirming that regular user can POST new animal to shelter.
+    @Test
+    fun addNewAnimalToShelter() {
+        // LOGGING IN
+        val loginResult = mockMvc.post(LOGIN_URL) {
+            contentType = APPLICATION_FORM_URLENCODED
+            param("username", "regular_user")
+            param("password", "best_password")
+        }.andExpect { cookie { exists("access_token") } }
+            .andReturn()
+        // GETTING COOKIE FROM LOGIN
+        val cookie = loginResult.response.getCookie("access_token")
+        assertThat(cookie).isNotNull
+        // POSTING NEW ANIMAL
+        val animalToAdd = AnimalRegistrationDto("Flix", HEDGEHOG, 3, 78)
+        val postResult = mockMvc.post("/api/shelter/animals") {
+            contentType = APPLICATION_JSON
+            content = jsonMapper.writeValueAsString(animalToAdd)
+            cookie(cookie!!)
+        }
+            .andExpect { status { isCreated() } }
+            .andReturn()
+        // CHECKING THAT RETURN RESULT IS CORRECT
+        val animalDto = jsonMapper
+            .readValue(postResult.response.contentAsString, AnimalDto::class.java)
+        assertThat(animalDto)
+            .isNotNull
+            .isEqualTo(KMapper(::AnimalDto)
+                .map(animalToAdd, mapOf("id" to animalDto.id)))
     }
 }
