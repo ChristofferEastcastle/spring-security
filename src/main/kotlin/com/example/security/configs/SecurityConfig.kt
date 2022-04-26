@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -31,9 +30,8 @@ class SecurityConfig(
 ) : WebSecurityConfigurerAdapter() {
     companion object {
         const val HOST = "localhost:8080/api"
-        const val LOGIN_URL = "/api/authentication/login"
-        const val REGISTER_URL = "/api/authentication/register"
-        const val LOGOUT_URL = "/api/authentication/logout"
+        const val LOGIN_URL = "/api/login"
+        const val LOGOUT_URL = "/api/logout"
     }
 
     @Bean
@@ -57,7 +55,7 @@ class SecurityConfig(
         http
             .addFilter(authFilter)
             .authorizeRequests()
-            .antMatchers(HttpMethod.GET,"/", REGISTER_URL, LOGIN_URL).permitAll()
+            .antMatchers("/", "/api/login", "/api/login-page").permitAll()
             .antMatchers("/api/users/**").hasAnyAuthority(ADMIN.name)
             .antMatchers("/api/shelter/**").hasAnyAuthority(ADMIN.name)
             .anyRequest()
@@ -70,7 +68,10 @@ class SecurityConfig(
             .logoutUrl(LOGOUT_URL)
             .logoutSuccessUrl("/")
             .deleteCookies("access_token")
-
+            .and()
+            .formLogin()
+            .loginProcessingUrl(LOGIN_URL)
+            .loginPage("/api/login-page")
     }
 
     @Bean
